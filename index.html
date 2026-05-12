@@ -1,559 +1,1451 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Line Chef</title>
-    <style>
-        * { box-sizing: border-box; user-select: none; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f3f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        #game-container {
-            width: 800px;
-            height: 600px;
-            background: #fff8f0;
-            border: 8px solid #ff9f43;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        /* Top Banner */
-        #hud {
-            height: 60px;
-            background: #ff9f43;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        /* Customers Zone */
-        #customers-zone {
-            height: 180px;
-            display: flex;
-            align-items: flex-end;
-            padding: 10px;
-            gap: 20px;
-            background: #fff;
-            border-bottom: 4px dashed #ffeaec;
-        }
-        .customer {
-            width: 110px;
-            background: #f8f9fa;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 8px;
-            text-align: center;
-            position: relative;
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .avatar { font-size: 36px; margin-bottom: 5px; }
-        .bubble {
-            background: #fff;
-            border: 2px solid #54a0ff;
-            border-radius: 8px;
-            padding: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        .patience-bar {
-            width: 100%;
-            height: 8px;
-            background: #eee;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .patience-fill {
-            width: 100%;
-            height: 100%;
-            background: #10ac84;
-            transition: width 0.1s linear, background-color 0.5s ease;
-        }
-        /* Kitchen Counters */
-        #kitchen-counter {
-            height: 360px;
-            background: #fdf2e9;
-            position: relative;
-            padding: 20px;
-        }
-        .section-title {
-            font-size: 14px;
-            font-weight: bold;
-            color: #84817a;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        /* Grid Alignment */
-        #workspace {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr 1fr;
-            gap: 20px;
-            height: 100%;
-        }
-        .station {
-            background: rgba(255,255,255,0.6);
-            border: 2px solid #dcdde1;
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-        }
-        /* Ingredient Bins */
-        .bin-grid, .plate-grid, .stove-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            flex-grow: 1;
-        }
-        .bin {
-            background: #fff;
-            border: 3px solid #54a0ff;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.1s;
-        }
-        .bin:active { transform: scale(0.95); }
-        .bin-icon { font-size: 32px; }
-        /* Stoves */
-        .stove {
-            background: #2f3640;
-            border-radius: 8px;
-            border: 3px solid #718093;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 13px;
-        }
-        .stove.cooking { border-color: #ee5253; background: #3d3d3d; }
-        .stove.cooked { border-color: #10ac84; background: #222; }
-        .stove.burned { border-color: #000; background: #111; color: #ff4d4d; }
-        .stove-timer {
-            width: 80%;
-            height: 6px;
-            background: #444;
-            border-radius: 3px;
-            margin-top: 5px;
-            overflow: hidden;
-            display: none;
-        }
-        .stove-timer-fill { width: 0%; height: 100%; background: #ee5253; }
-        /* Plates */
-        .plate {
-            background: #ffffff;
-            border: 3px dashed #ff9f43;
-            border-radius: 50%;
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-        }
-        .plate.has-food { border-style: solid; background: #fffcf5; }
-        .plate-food { font-size: 28px; }
-        /* Screens */
-        .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-        .screen h1 { font-size: 48px; margin-bottom: 10px; color: #ff9f43; }
-        .screen p { font-size: 20px; margin-bottom: 20px; }
-        .btn {
-            background: #ff9f43;
-            border: none;
-            color: white;
-            padding: 15px 40px;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255,159,67,0.4);
-        }
-        .btn:hover { background: #ffaa54; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MUTATION LAB :: GENESIS</title>
+
+<!--
+  =====================================================================
+  MUTATION LAB :: GENESIS  -  A single-file biopunk clicker game.
+  =====================================================================
+  HOW TO ADD CUSTOM IMAGES
+  ------------------------
+  Each evolution stage is drawn as inline SVG inside svgFor(stageIdx).
+  To use your own art, replace the <svg> markup with an <img> tag:
+    <img src="my-creature-stage3.png" class="monster-art" />
+  Or set a CSS background-image on #monster-art and remove the SVG block.
+  Stages are keyed by index 0..5 (Cell, Larva, Crawler, Beast, Titan, Eldritch).
+
+  HOW TO ADD CUSTOM SOUNDS
+  ------------------------
+  Look for the playSound(name) helper. It contains tiny WebAudio synth
+  sounds by default. To use audio files, drop something like this in:
+    const sfx = { click: new Audio('click.wav'), evolve: new Audio('evolve.wav') };
+    function playSound(name) { sfx[name]?.play(); }
+
+  CHEAT CODES (open with ` or ~ key, or tap the small "admin" in the corner)
+  --------------------------------------------------------------------
+    GREEDISGOOD   -> +1,000,000 biomass
+    EVOLVENOW     -> max out every active mutation
+    FASTFORWARD   -> permanent 10x to passive income
+    GODMODE       -> all upgrades cost 0
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=JetBrains+Mono:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+/* ====================== CORE TOKENS ====================== */
+:root {
+  --bg-0: #07090a;
+  --bg-1: #0c1112;
+  --bg-2: #131a1b;
+  --line: #1e2a2b;
+  --acid: #b4ff39;
+  --acid-dim: #6a9923;
+  --rot: #8a5cff;
+  --blood: #ff3b6b;
+  --bone: #e6f0c2;
+  --muted: #6b7a6e;
+  --warn: #ffb347;
+  --shadow-glow: 0 0 24px rgba(180, 255, 57, 0.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-0);
+  color: var(--bone);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* CRT scanline + grain overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px
+    ),
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+  z-index: 9999;
+  mix-blend-mode: multiply;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.7  0 0 0 0 0.9  0 0 0 0 0.3  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.5;
+  z-index: 9998;
+}
+
+/* ====================== LAYOUT ====================== */
+#app {
+  display: grid;
+  grid-template-columns: 320px 1fr 340px;
+  grid-template-rows: 64px 1fr 56px;
+  grid-template-areas:
+    "header  header   header"
+    "active  stage    passive"
+    "footer  footer   footer";
+  height: 100vh;
+  gap: 1px;
+  background: var(--line);
+}
+
+@media (max-width: 1100px) {
+  #app { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto auto;
+         grid-template-areas: "header" "stage" "active" "passive" "footer"; height: auto; }
+}
+
+header.bar {
+  grid-area: header;
+  background: linear-gradient(180deg, #0a0e0f 0%, #050708 100%);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--acid-dim);
+  position: relative;
+  overflow: hidden;
+}
+header.bar::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  animation: scanline 4s linear infinite;
+}
+@keyframes scanline { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
+
+.brand {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 22px;
+  letter-spacing: 6px;
+  color: var(--acid);
+  text-shadow: 0 0 10px rgba(180,255,57,0.5);
+}
+.brand .sub { color: var(--rot); font-size: 11px; letter-spacing: 4px; margin-left: 8px; }
+.brand .blink { animation: blink 1.1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+.stats {
+  display: flex; gap: 24px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;
+}
+.stat label { color: var(--muted); display: block; font-size: 9px; }
+.stat .val { color: var(--bone); font-size: 16px; font-weight: 600; }
+.stat .val.big { color: var(--acid); text-shadow: 0 0 8px rgba(180,255,57,0.4); }
+.stat .val.fk { color: var(--rot); text-shadow: 0 0 8px rgba(138,92,255,0.4); }
+
+/* ====================== PANELS ====================== */
+.panel {
+  background: var(--bg-1);
+  padding: 14px 14px 60px;
+  overflow-y: auto;
+  position: relative;
+}
+.panel.left  { grid-area: active; border-right: 1px solid var(--line); }
+.panel.right { grid-area: passive; border-left: 1px solid var(--line); }
+
+.panel-title {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--bone);
+  padding: 2px 0 12px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title::before { content: 'I'; color: var(--acid); }
+.panel.right .panel-title::before { color: var(--rot); }
+.panel-title .tag { margin-left:auto; font-size: 9px; color: var(--muted); letter-spacing: 2px; }
+
+/* webkit scrollbar */
+.panel::-webkit-scrollbar { width: 6px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.panel::-webkit-scrollbar-thumb:hover { background: var(--acid-dim); }
+
+/* ====================== UPGRADE CARDS ====================== */
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+}
+.card:hover { transform: translateX(2px); border-color: var(--acid-dim); }
+.card.affordable { border-color: var(--acid-dim); }
+.card.affordable:hover { box-shadow: var(--shadow-glow); }
+.card.locked { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
+.card.locked:hover { transform: none; box-shadow: none; }
+.card.maxed { border-color: var(--rot); }
+.card.maxed::after { content: 'APEX'; position: absolute; top: 6px; right: 8px;
+  font-size: 9px; letter-spacing: 2px; color: var(--rot); }
+
+.card-row { display: flex; align-items: center; gap: 10px; }
+.card-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: #050807;
+  border: 1px solid var(--line);
+  display: grid; place-items: center;
+  font-size: 18px;
+  position: relative;
+}
+.panel.right .card-icon { color: var(--rot); }
+.panel.left  .card-icon { color: var(--acid); }
+
+.card-info { flex: 1; min-width: 0; }
+.card-name { font-weight: 600; font-size: 12px; letter-spacing: 0.5px; }
+.card-desc { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.card-meta { display: flex; gap: 10px; margin-top: 6px; font-size: 10px; flex-wrap: wrap; }
+.card-meta span { color: var(--muted); }
+.card-meta b { color: var(--bone); font-weight: 600; }
+.card-meta .cost.ok { color: var(--acid); }
+.card-meta .cost.bad { color: var(--blood); }
+
+.progress {
+  height: 3px;
+  background: #050807;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--acid-dim), var(--acid));
+  box-shadow: 0 0 8px var(--acid);
+  transition: width 0.4s cubic-bezier(.2,.7,.2,1);
+}
+.panel.right .progress-fill {
+  background: linear-gradient(90deg, #4a2a99, var(--rot));
+  box-shadow: 0 0 8px var(--rot);
+}
+
+/* ====================== STAGE / MONSTER ====================== */
+.stage {
+  grid-area: stage;
+  background:
+    radial-gradient(circle at 50% 55%, rgba(180,255,57,0.08) 0%, transparent 55%),
+    radial-gradient(circle at 30% 80%, rgba(138,92,255,0.08) 0%, transparent 50%),
+    var(--bg-0);
+  position: relative;
+  overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.stage::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(180,255,57,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,255,57,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.stage-info {
+  position: absolute; top: 16px; left: 0; right: 0;
+  text-align: center; pointer-events: none;
+  font-size: 10px; letter-spacing: 4px; color: var(--muted);
+}
+.stage-info .name {
+  display: block; font-family: 'Major Mono Display', monospace;
+  font-size: 18px; color: var(--acid); margin-top: 4px;
+  text-shadow: 0 0 12px rgba(180,255,57,0.4);
+}
+
+#monster-wrap {
+  width: min(440px, 80vw);
+  height: min(440px, 60vh);
+  position: relative;
+  display: grid; place-items: center;
+  user-select: none;
+}
+
+#monster-art {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 12px 36px rgba(180,255,57,0.25));
+  cursor: pointer;
+  transition: transform 0.05s;
+}
+
+/* SQUISH ANIMATION on click */
+#monster-art.squish {
+  animation: squish 0.22s cubic-bezier(.4,1.6,.5,1);
+}
+@keyframes squish {
+  0%   { transform: scale(1, 1); }
+  35%  { transform: scale(1.12, 0.86); }
+  60%  { transform: scale(0.92, 1.08); }
+  100% { transform: scale(1, 1); }
+}
+
+/* Ambient breathing */
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(1.025) translateY(-4px); }
+}
+#monster-art { animation: breathe 4.5s ease-in-out infinite; }
+
+/* Click ripple */
+.ripple {
+  position: absolute;
+  width: 60px; height: 60px;
+  border: 1px solid var(--acid);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.2);
+  animation: rippleOut 0.6s ease-out forwards;
+}
+@keyframes rippleOut {
+  to { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+}
+
+/* Floating numbers on click */
+.floater {
+  position: fixed;
+  pointer-events: none;
+  color: var(--acid);
+  font-weight: 800;
+  font-size: 18px;
+  text-shadow: 0 0 6px rgba(180,255,57,0.8), 0 2px 0 #000;
+  animation: floatUp 0.9s ease-out forwards;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+.floater.crit { color: var(--blood); font-size: 24px; text-shadow: 0 0 10px var(--blood), 0 2px 0 #000;}
+@keyframes floatUp {
+  0%   { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  15%  { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -160%) scale(0.9); opacity: 0; }
+}
+
+/* Evolution flash */
+.evo-flash {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(180,255,57,0.6), transparent 70%);
+  pointer-events: none; opacity: 0;
+  animation: evoFlash 1.2s ease-out forwards;
+}
+@keyframes evoFlash {
+  0% { opacity: 0; transform: scale(0.6); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(2.5); }
+}
+
+/* Stage progress bar */
+.stage-progress {
+  position: absolute; bottom: 16px; left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, 70%);
+  text-align: center;
+}
+.stage-progress .lbl {
+  font-size: 9px; letter-spacing: 3px; color: var(--muted);
+  display: flex; justify-content: space-between; margin-bottom: 4px;
+}
+.stage-bar {
+  height: 4px; background: #050807; border: 1px solid var(--line);
+  overflow: hidden; position: relative;
+}
+.stage-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rot), var(--acid));
+  box-shadow: 0 0 10px var(--acid);
+  transition: width 0.4s ease;
+}
+
+/* ====================== FOOTER ====================== */
+footer.bar {
+  grid-area: footer;
+  background: #050708;
+  border-top: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  gap: 12px;
+}
+.footer-left, .footer-right { display: flex; gap: 12px; align-items: center; font-size: 10px; color: var(--muted); letter-spacing: 1.5px;}
+
+#prestige-btn {
+  background: linear-gradient(180deg, #1a0e3a, #0a0419);
+  color: var(--rot);
+  border: 1px solid var(--rot);
+  padding: 8px 22px;
+  font-family: 'Major Mono Display', monospace;
+  font-size: 13px;
+  letter-spacing: 4px;
+  cursor: pointer;
+  position: relative;
+  text-shadow: 0 0 6px rgba(138,92,255,0.5);
+  transition: all 0.2s;
+}
+#prestige-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #2a1655, #0a0419);
+  box-shadow: 0 0 20px rgba(138,92,255,0.5);
+}
+#prestige-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.io-btn {
+  background: transparent; color: var(--muted); border: 1px solid var(--line);
+  padding: 5px 10px; font-family: inherit; font-size: 10px; letter-spacing: 2px;
+  cursor: pointer; transition: all 0.15s;
+}
+.io-btn:hover { color: var(--acid); border-color: var(--acid-dim); }
+
+/* ====================== MODAL (PRESTIGE TREE) ====================== */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(5, 7, 8, 0.85);
+  backdrop-filter: blur(4px);
+  display: none;
+  z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.show { display: flex; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal {
+  width: min(720px, 92vw);
+  max-height: 88vh; overflow-y: auto;
+  background: var(--bg-1);
+  border: 1px solid var(--rot);
+  box-shadow: 0 0 40px rgba(138,92,255,0.3);
+  padding: 26px;
+  position: relative;
+}
+.modal h2 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 22px; letter-spacing: 6px; color: var(--rot);
+  margin-bottom: 6px;
+}
+.modal .sub { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 18px; }
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  background: transparent; color: var(--muted); border: 1px solid var(--line);
+  width: 28px; height: 28px; font-size: 14px; cursor: pointer;
+}
+.modal-close:hover { color: var(--blood); border-color: var(--blood); }
+
+.fk-pool {
+  background: var(--bg-2); border: 1px solid var(--line);
+  padding: 12px; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.fk-pool .label { font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+.fk-pool .value { font-size: 22px; color: var(--rot); font-weight: 600; }
+
+.perks-grid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.perk {
+  background: var(--bg-2); border: 1px solid var(--line);
+  padding: 12px; cursor: pointer; transition: all 0.15s;
+}
+.perk:hover { border-color: var(--rot); }
+.perk-name { font-weight: 700; font-size: 12px; color: var(--rot); letter-spacing: 1px; }
+.perk-desc { font-size: 10px; color: var(--muted); margin: 6px 0 8px; }
+.perk-meta { display: flex; justify-content: space-between; font-size: 10px; }
+.perk .lvl { color: var(--bone); }
+.perk .cost.ok { color: var(--acid); }
+.perk .cost.bad { color: var(--blood); }
+.perk.maxed { border-color: var(--acid-dim); opacity: 0.7; }
+
+.do-breach {
+  margin-top: 18px; width: 100%; padding: 12px;
+  background: var(--bg-2); border: 1px solid var(--rot); color: var(--rot);
+  font-family: 'Major Mono Display', monospace; letter-spacing: 6px; font-size: 14px;
+  cursor: pointer;
+}
+.do-breach:hover:not(:disabled) { background: rgba(138,92,255,0.15); box-shadow: 0 0 20px rgba(138,92,255,0.3); }
+.do-breach:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ====================== ADMIN CONSOLE ====================== */
+#admin-toggle {
+  position: fixed; bottom: 6px; left: 6px; z-index: 500;
+  background: transparent; border: none; color: var(--line);
+  font-size: 10px; cursor: pointer; font-family: inherit;
+  letter-spacing: 1px;
+}
+#admin-toggle:hover { color: var(--acid-dim); }
+
+#admin {
+  position: fixed; bottom: 12px; left: 12px;
+  width: 320px; background: #000; border: 1px solid var(--acid);
+  padding: 14px; z-index: 600; display: none;
+  box-shadow: 0 0 30px rgba(180,255,57,0.2);
+  font-family: 'JetBrains Mono', monospace;
+}
+#admin.show { display: block; animation: termOpen 0.2s; }
+@keyframes termOpen { from{transform:translateY(20px); opacity:0} to{transform:translateY(0); opacity:1} }
+
+#admin .term-title {
+  font-size: 10px; letter-spacing: 3px; color: var(--acid);
+  margin-bottom: 8px; display: flex; justify-content: space-between;
+}
+#admin input {
+  width: 100%; background: #050807; border: 1px solid var(--line); color: var(--acid);
+  padding: 8px; font-family: inherit; font-size: 12px; outline: none;
+  letter-spacing: 2px;
+}
+#admin input:focus { border-color: var(--acid); box-shadow: 0 0 8px rgba(180,255,57,0.3); }
+#admin .term-log {
+  margin-top: 8px; font-size: 10px; color: var(--muted);
+  max-height: 100px; overflow-y: auto; line-height: 1.6;
+}
+#admin .term-log .ok { color: var(--acid); }
+#admin .term-log .err { color: var(--blood); }
+#admin .hint { font-size: 9px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--bg-2); border: 1px solid var(--acid);
+  padding: 12px 24px; color: var(--acid); font-size: 12px; letter-spacing: 3px;
+  z-index: 2000; box-shadow: 0 0 20px rgba(180,255,57,0.3);
+  animation: toastIn 0.3s, toastOut 0.4s 2.6s forwards;
+  text-transform: uppercase;
+}
+@keyframes toastIn  { from{opacity:0; transform:translate(-50%, -20px)} to{opacity:1; transform:translate(-50%, 0)} }
+@keyframes toastOut { to{opacity:0; transform:translate(-50%, -20px)} }
+
+/* Mini-status (top-right of monster) */
+.click-power-pill {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(5,7,8,0.7); border: 1px solid var(--line);
+  padding: 6px 10px; font-size: 10px; letter-spacing: 2px;
+  z-index: 5;
+}
+.click-power-pill b { color: var(--acid); }
+
+</style>
 </head>
+
 <body>
+<div id="app">
 
-<div id="game-container">
-    <!-- HUD Layer -->
-    <div id="hud">
-        <div id="score-display">Score: 0</div>
-        <div id="timer-display">Time: 60</div>
+  <header class="bar">
+    <div class="brand">
+      mutation lab <span class="sub">// genesis<span class="blink">_</span></span>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <label>Biomass</label>
+        <span class="val big" id="ui-biomass">0</span>
+      </div>
+      <div class="stat">
+        <label>Per Click</label>
+        <span class="val" id="ui-cps">1</span>
+      </div>
+      <div class="stat">
+        <label>Per Second</label>
+        <span class="val" id="ui-pps">0</span>
+      </div>
+      <div class="stat">
+        <label>Forbidden Knowledge</label>
+        <span class="val fk" id="ui-fk">0</span>
+      </div>
+    </div>
+  </header>
+
+  <aside class="panel left">
+    <div class="panel-title">Active Mutations <span class="tag">CLICK POWER</span></div>
+    <div id="mutations-list"></div>
+  </aside>
+
+  <section class="stage">
+    <div class="stage-info">
+      <span id="stage-label">STAGE 1 / 6</span>
+      <span class="name" id="stage-name">cell</span>
     </div>
 
-    <!-- Gameplay Zones -->
-    <div id="customers-zone"></div>
-   
-    <div id="kitchen-counter">
-        <div id="workspace">
-            <!-- Left: Raw Ingredients Box -->
-            <div class="station">
-                <div class="section-title">1. Raw Food</div>
-                <div class="bin-grid">
-                    <div class="bin" onclick="interactStove('🥩')">
-                        <span class="bin-icon">🥩</span><span>Beef</span>
-                    </div>
-                    <div class="bin" onclick="interactStove('🐟')">
-                        <span class="bin-icon">🐟</span><span>Fish</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Center: Heat Stoves -->
-            <div class="station">
-                <div class="section-title">2. Grill Station (Tap Raw Next)</div>
-                <div class="stove-grid">
-                    <div id="stove-0" class="stove" onclick="clickStove(0)">Empty</div>
-                    <div id="stove-1" class="stove" onclick="clickStove(1)">Empty</div>
-                </div>
-            </div>
-
-            <!-- Right: Plates & Condiments -->
-            <div class="station">
-                <div class="section-title">3. Assemble & Serve</div>
-                <div class="plate-grid">
-                    <div id="plate-0" class="plate" onclick="clickPlate(0)">Empty</div>
-                    <div id="plate-1" class="plate" onclick="clickPlate(1)">Empty</div>
-                </div>
-                <div style="display:flex; gap: 5px; margin-top:5px;">
-                    <button style="flex:1; padding:5px; font-size:11px;" onclick="addTopping('🧀')">+🧀 Cheese</button>
-                    <button style="flex:1; padding:5px; font-size:11px;" onclick="addTopping('🍅')">+🍅 Tomato</button>
-                </div>
-            </div>
-        </div>
+    <div id="monster-wrap">
+      <div class="click-power-pill">+<b id="ui-click-pop">1</b> / click</div>
+      <div id="monster-art"></div>
     </div>
 
-    <!-- UI Overlay Screens -->
-    <div id="start-screen" class="screen">
-        <h1>Mini Line Chef</h1>
-        <p>Cook dishes, assemble toppings, and serve fast!</p>
-        <button class="btn" onclick="startGame()">Start Kitchen</button>
+    <div class="stage-progress">
+      <div class="lbl"><span id="stage-progress-cur">0</span><span id="stage-progress-need">-> 1.00K</span></div>
+      <div class="stage-bar"><div class="stage-bar-fill" id="stage-bar-fill" style="width:0%"></div></div>
+    </div>
+  </section>
+
+  <aside class="panel right">
+    <div class="panel-title">Passive Upgrades <span class="tag">/SECOND</span></div>
+    <div id="upgrades-list"></div>
+  </aside>
+
+  <footer class="bar">
+    <div class="footer-left">
+      <button class="io-btn" id="save-btn">SAVE</button>
+      <button class="io-btn" id="reset-btn">HARD RESET</button>
+      <span id="autosave-tick">autosaves every 15s</span>
+    </div>
+    <button id="prestige-btn" disabled>// THE BREACH //</button>
+    <div class="footer-right">
+      <span id="lifetime-display">lifetime: 0</span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- PRESTIGE MODAL -->
+<div class="modal-backdrop" id="prestige-modal">
+  <div class="modal">
+    <button class="modal-close" id="prestige-close">x</button>
+    <h2>THE BREACH</h2>
+    <p class="sub">// rip your specimen apart. carry the memory forward //</p>
+
+    <div class="fk-pool">
+      <div>
+        <div class="label">Forbidden Knowledge held</div>
+        <div class="value" id="modal-fk-cur">0</div>
+      </div>
+      <div style="text-align:right">
+        <div class="label">Gain on breach</div>
+        <div class="value" id="modal-fk-gain" style="color:var(--acid)">0</div>
+      </div>
     </div>
 
-    <div id="game-over-screen" class="screen" style="display: none;">
-        <h1>Shift Ended!</h1>
-        <p id="final-score">Your Final Score: 0</p>
-        <button class="btn" onclick="startGame()">Cook Again</button>
-    </div>
+    <div class="perks-grid" id="perks-grid"></div>
+
+    <button class="do-breach" id="do-breach" disabled>// COMMIT BREACH //</button>
+  </div>
+</div>
+
+<!-- ADMIN CONSOLE -->
+<button id="admin-toggle" title="open admin (`)">// admin</button>
+<div id="admin">
+  <div class="term-title">
+    <span>// ADMIN OVERRIDE</span>
+    <span id="admin-close" style="cursor:pointer">[x]</span>
+  </div>
+  <input id="admin-input" placeholder="enter override code..." autocomplete="off" spellcheck="false" />
+  <div class="term-log" id="admin-log"></div>
+  <div class="hint">press ` or ~ to toggle. type HELP for codes.</div>
 </div>
 
 <script>
-    // Game System Constants & State Variables
-    const COOK_TIME = 3000;  // 3 seconds to cook
-    const BURN_TIME = 4000;  // 4 seconds more to burn
-    const GAME_DURATION = 60; // 60-second shifts
+// =====================================================================
+// MUTATION LAB :: GENESIS  - game logic
+// =====================================================================
 
-    let score = 0;
-    let timeLeft = GAME_DURATION;
-    let gameInterval = null;
-    let customerSpawnTimeout = null;
-    let activeQueues = [];
-    let selectedIngredient = null;
+// ---------- BIG NUMBER FORMATTER ----------
+// Works through trillions natively, then drops to scientific notation.
+const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+function fmt(n) {
+  if (!isFinite(n)) return 'inf';
+  if (n < 0) return '-' + fmt(-n);
+  if (n < 1) return n.toFixed(2);
+  if (n < 1000) return Math.floor(n).toString();
+  const tier = Math.floor(Math.log10(n) / 3);
+  if (tier < SUFFIXES.length) {
+    const scaled = n / Math.pow(10, tier * 3);
+    return scaled.toFixed(scaled >= 100 ? 1 : 2) + SUFFIXES[tier];
+  }
+  // scientific
+  const exp = Math.floor(Math.log10(n));
+  const mant = n / Math.pow(10, exp);
+  return mant.toFixed(2) + 'e' + exp;
+}
 
-    // Entities Arrays
-    const recipes = [
-        { name: "Steak", base: "🥩", items: ["🥩"], served: "🍖" },
-        { name: "Cheesy Steak", base: "🥩", items: ["🥩", "🧀"], served: "🍔" },
-        { name: "Fish Fillet", base: "🐟", items: ["🐟"], served: "🍣" },
-        { name: "Tomato Fish", base: "🐟", items: ["🐟", "🍅"], served: "🍲" }
-    ];
+// ---------- CONTENT DATABASE ----------
+// MUTATIONS: active upgrades that boost per-click damage.
+const MUTATIONS = [
+  { id:'teeth',     name:'Sharper Teeth',     icon:'#', desc:'Crude incisors. The basics.',
+    base:15,       grow:1.18, power:1,        max:50 },
+  { id:'claws',     name:'Razor Claws',       icon:'V', desc:'Tear into the substrate.',
+    base:120,      grow:1.20, power:6,        max:50 },
+  { id:'acid',      name:'Acid Glands',       icon:'@', desc:'Dissolve before consuming.',
+    base:1200,     grow:1.22, power:35,       max:50 },
+  { id:'spike',     name:'Bone Spikes',       icon:'*', desc:'Extruded calcium daggers.',
+    base:13000,    grow:1.22, power:180,      max:50 },
+  { id:'tendril',   name:'Whip Tendrils',     icon:'~', desc:'Reach across the room.',
+    base:140000,   grow:1.24, power:900,      max:40 },
+  { id:'psy',       name:'Psychic Lash',      icon:'%', desc:'Crush minds, then matter.',
+    base:1.6e6,    grow:1.25, power:4800,     max:40 },
+  { id:'plasma',    name:'Plasma Veins',      icon:'=', desc:'Liquid sun beneath the skin.',
+    base:2e7,      grow:1.26, power:27000,    max:40 },
+  { id:'anti',      name:'Antimatter Heart',  icon:'O', desc:'A core that should not be.',
+    base:2.4e8,    grow:1.28, power:160000,   max:30 },
+  { id:'singularity', name:'Singularity Core', icon:'X', desc:'Gravity bends to feed it.',
+    base:3.2e9,    grow:1.30, power:920000,   max:25 },
+  { id:'apoc',      name:'Apocalypse Form',   icon:'!', desc:'Final mutation. Final form?',
+    base:5.5e10,   grow:1.33, power:5.6e6,    max:20 },
+];
 
-    const customerAvatars = ['🐱', '🐰', '🐻', '🦊', '🦁'];
+// UPGRADES: passive biomass per second.
+const UPGRADES = [
+  { id:'petri',    name:'Petri Dish',         icon:'o', desc:'Static culture. Watches.',
+    base:25,       grow:1.15, rate:0.5,   max:100 },
+  { id:'reactor',  name:'Bio Reactor',        icon:'R', desc:'Bubbling vat of want.',
+    base:300,      grow:1.15, rate:5,     max:100 },
+  { id:'splicer',  name:'Gene Splicer',       icon:'S', desc:'Snips and weaves.',
+    base:3.4e3,    grow:1.16, rate:45,    max:100 },
+  { id:'hatch',    name:'Hatchery',           icon:'^', desc:'Birthing chamber, lit dim.',
+    base:48000,    grow:1.17, rate:280,   max:100 },
+  { id:'mutapool', name:'Mutagen Pool',       icon:'M', desc:'Swim. Become.',
+    base:6.4e5,    grow:1.18, rate:1700,  max:100 },
+  { id:'forge',    name:'DNA Forge',          icon:'F', desc:'Hammer on the helix.',
+    base:8.5e6,    grow:1.19, rate:11000, max:80 },
+  { id:'qlab',     name:'Quantum Lab',        icon:'Q', desc:'Both alive and not.',
+    base:1.2e8,    grow:1.20, rate:75000, max:80 },
+  { id:'womb',     name:'Cosmic Womb',        icon:'W', desc:'Spawn from a dying star.',
+    base:1.8e9,    grow:1.22, rate:520000,max:60 },
+  { id:'breach',   name:'Reality Breach',     icon:'B', desc:'Pull biomass from elsewhere.',
+    base:2.8e10,   grow:1.24, rate:3.6e6, max:50 },
+  { id:'void',     name:'Void Genesis',       icon:'V', desc:'It makes itself now.',
+    base:4.4e11,   grow:1.26, rate:2.5e7, max:40 },
+];
 
-    let stoves = [
-        { id: 0, status: 'idle', food: null, progress: 0, timer: null },
-        { id: 1, status: 'idle', food: null, progress: 0, timer: null }
-    ];
+// EVOLUTION STAGES: thresholds determine the visual form.
+const STAGES = [
+  { name:'cell',     threshold: 0      },
+  { name:'larva',    threshold: 1e3    },
+  { name:'crawler',  threshold: 1e5    },
+  { name:'beast',    threshold: 1e7    },
+  { name:'titan',    threshold: 1e9    },
+  { name:'eldritch', threshold: 1e12   },
+];
 
-    let plates = [
-        { id: 0, items: [], display: "" },
-        { id: 1, items: [], display: "" }
-    ];
+// PRESTIGE PERKS: persist after breach. Cost rises with level.
+const PERKS = [
+  { id:'cellmem',   name:'Deep Cell Memory',
+    desc:'+8% biomass per click, per level. Compounds at rebirth.',
+    base:1, growCost:1.6, max:25,
+    apply:(lv) => ({ clickMult: Math.pow(1.08, lv) }) },
+  { id:'mitotic',   name:'Mitotic Echo',
+    desc:'+10% passive production per level.',
+    base:1, growCost:1.7, max:20,
+    apply:(lv) => ({ passiveMult: Math.pow(1.10, lv) }) },
+  { id:'compound',  name:'Genetic Compounding',
+    desc:'All upgrade & mutation costs -3% per level.',
+    base:2, growCost:1.8, max:15,
+    apply:(lv) => ({ costMult: Math.pow(0.97, lv) }) },
+  { id:'spark',     name:'Primordial Spark',
+    desc:'Start each cycle with biomass equal to 250 x level.',
+    base:3, growCost:1.5, max:30,
+    apply:(lv) => ({ startBiomass: 250 * lv }) },
+  { id:'catalyst',  name:'Catalyst Bloom',
+    desc:'+15% Forbidden Knowledge gain per level.',
+    base:5, growCost:2.0, max:10,
+    apply:(lv) => ({ fkMult: Math.pow(1.15, lv) }) },
+];
 
-    // Engine Core Initialization
-    function startGame() {
-        score = 0;
-        timeLeft = GAME_DURATION;
-        activeQueues = [];
-        selectedIngredient = null;
-       
-        stoves.forEach((s, idx) => resetStove(idx));
-        plates.forEach((p, idx) => resetPlate(idx));
-       
-        document.getElementById('score-display').innerText = `Score: ${score}`;
-        document.getElementById('timer-display').innerText = `Time: ${timeLeft}`;
-        document.getElementById('customers-zone').innerHTML = '';
-       
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('game-over-screen').style.display = 'none';
+// ---------- STATE ----------
+const DEFAULT_STATE = () => ({
+  biomass: 0,
+  lifetime: 0,                          // total biomass earned this run (resets on breach)
+  grandLifetime: 0,                     // total biomass earned across all runs
+  mutations: Object.fromEntries(MUTATIONS.map(m=>[m.id,0])),
+  upgrades:  Object.fromEntries(UPGRADES.map(u=>[u.id,0])),
+  perks:     Object.fromEntries(PERKS.map(p=>[p.id,0])),
+  fk: 0,
+  godMode: false,
+  passiveMultCheat: 1,
+  stage: 0,
+});
 
-        // Background Core Engines
-        gameInterval = setInterval(updateClock, 1000);
-        spawnCustomer();
+let state = DEFAULT_STATE();
+
+// ---------- DERIVED VALUES ----------
+function perkBundle() {
+  const bundle = { clickMult:1, passiveMult:1, costMult:1, startBiomass:0, fkMult:1 };
+  for (const p of PERKS) {
+    const lv = state.perks[p.id] || 0;
+    if (!lv) continue;
+    const eff = p.apply(lv);
+    for (const k in eff) {
+      if (k === 'startBiomass') bundle[k] += eff[k];
+      else bundle[k] *= eff[k];
     }
+  }
+  return bundle;
+}
 
-    function updateClock() {
-        timeLeft--;
-        document.getElementById('timer-display').innerText = `Time: ${timeLeft}`;
-        if (timeLeft <= 0) {
-            endGame();
-        }
+function computeClickPower() {
+  const bundle = perkBundle();
+  let pwr = 1; // baseline
+  for (const m of MUTATIONS) {
+    pwr += (state.mutations[m.id] || 0) * m.power;
+  }
+  return pwr * bundle.clickMult;
+}
+
+function computePassive() {
+  const bundle = perkBundle();
+  let pps = 0;
+  for (const u of UPGRADES) {
+    pps += (state.upgrades[u.id] || 0) * u.rate;
+  }
+  return pps * bundle.passiveMult * state.passiveMultCheat;
+}
+
+function costOf(def, owned) {
+  if (state.godMode) return 0;
+  const bundle = perkBundle();
+  return Math.ceil(def.base * Math.pow(def.grow, owned) * bundle.costMult);
+}
+
+function perkCost(p) {
+  const lv = state.perks[p.id] || 0;
+  return Math.ceil(p.base * Math.pow(p.growCost, lv));
+}
+
+function fkOnBreach() {
+  // Square-root scaling on grand lifetime keeps gains feeling earned.
+  const base = Math.floor(Math.sqrt(state.grandLifetime / 1e6));
+  return Math.floor(base * perkBundle().fkMult);
+}
+
+// ---------- STAGE / EVOLUTION ----------
+function currentStage() {
+  let idx = 0;
+  for (let i = 0; i < STAGES.length; i++) {
+    if (state.lifetime >= STAGES[i].threshold) idx = i;
+  }
+  return idx;
+}
+
+// SVG art for each evolution stage. Replace any block with <img src="...">.
+function svgFor(stageIdx) {
+  switch (stageIdx) {
+    case 0: // CELL
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g0" cx="40%" cy="40%">
+            <stop offset="0%" stop-color="#d6ff8c"/>
+            <stop offset="55%" stop-color="#7fb821"/>
+            <stop offset="100%" stop-color="#2d4a0d"/>
+          </radialGradient>
+        </defs>
+        <circle r="62" fill="url(#g0)" stroke="#1a2807" stroke-width="2"/>
+        <circle r="24" cx="-8" cy="-6" fill="#1f3408" opacity="0.9"/>
+        <circle r="6"  cx="-14" cy="-12" fill="#9eff3a"/>
+        <circle r="3"  cx="14" cy="20" fill="#1f3408"/>
+        <circle r="2"  cx="22" cy="-8" fill="#1f3408"/>
+      </svg>`;
+
+    case 1: // LARVA
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1">
+            <stop offset="0%" stop-color="#b9ee5a"/>
+            <stop offset="100%" stop-color="#4d7a18"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="0" cy="0" rx="78" ry="44" fill="url(#g1)" stroke="#1a2807" stroke-width="2"/>
+        <path d="M-60,-2 q-15,-22 -25,8 q25,-2 25,-8" fill="#1a2807"/>
+        <ellipse cx="-40" cy="0" rx="58" ry="36" fill="none" stroke="#1a2807" stroke-width="1" opacity="0.4"/>
+        <ellipse cx="-10" cy="0" rx="58" ry="36" fill="none" stroke="#1a2807" stroke-width="1" opacity="0.4"/>
+        <ellipse cx="20"  cy="0" rx="58" ry="36" fill="none" stroke="#1a2807" stroke-width="1" opacity="0.4"/>
+        <circle cx="45" cy="-8" r="8" fill="#fff"/>
+        <circle cx="48" cy="-8" r="4" fill="#000"/>
+        <circle cx="58" cy="8"  r="6" fill="#fff"/>
+        <circle cx="60" cy="8"  r="3" fill="#000"/>
+        <path d="M50,22 q10,8 22,2" fill="none" stroke="#1a2807" stroke-width="2"/>
+      </svg>`;
+
+    case 2: // CRAWLER
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g2" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#9bd84d"/>
+            <stop offset="100%" stop-color="#2b4807"/>
+          </radialGradient>
+        </defs>
+        <path d="M-60,40 q-20,30 -30,10 q5,15 20,12" fill="#2b4807"/>
+        <path d="M60,40 q20,30 30,10 q-5,15 -20,12" fill="#2b4807"/>
+        <path d="M-50,-30 q-40,-10 -50,-40 q15,25 35,30" fill="#2b4807"/>
+        <path d="M50,-30 q40,-10 50,-40 q-15,25 -35,30" fill="#2b4807"/>
+        <ellipse cx="0" cy="10" rx="72" ry="56" fill="url(#g2)" stroke="#0d1a02" stroke-width="2"/>
+        <path d="M-40,30 Q0,55 40,30 L34,38 L24,32 L12,42 L0,32 L-12,42 L-24,32 L-34,38 Z"
+              fill="#0d1a02" stroke="#fff" stroke-width="1.2"/>
+        <circle cx="-30" cy="-10" r="12" fill="#0d1a02"/>
+        <circle cx="-28" cy="-12" r="5" fill="#ff3b6b"/>
+        <circle cx="30"  cy="-10" r="12" fill="#0d1a02"/>
+        <circle cx="32"  cy="-12" r="5" fill="#ff3b6b"/>
+        <circle cx="0"   cy="-32" r="7" fill="#0d1a02"/>
+        <circle cx="1"   cy="-33" r="3" fill="#ff3b6b"/>
+      </svg>`;
+
+    case 3: // BEAST
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g3" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#b8e360"/>
+            <stop offset="60%" stop-color="#5a8a1d"/>
+            <stop offset="100%" stop-color="#1a2a08"/>
+          </radialGradient>
+        </defs>
+        <path d="M-40,-50 q-30,-30 -10,-50 q5,15 20,30" fill="#0d1a02" stroke="#000" stroke-width="1"/>
+        <path d="M40,-50  q30,-30  10,-50 q-5,15 -20,30" fill="#0d1a02" stroke="#000" stroke-width="1"/>
+        <path d="M-60,40 q-25,30 -35,55 l10,-5 q20,-20 25,-30" fill="#1a2a08"/>
+        <path d="M60,40  q25,30 35,55 l-10,-5 q-20,-20 -25,-30" fill="#1a2a08"/>
+        <ellipse cx="0" cy="10" rx="74" ry="62" fill="url(#g3)" stroke="#0d1a02" stroke-width="2"/>
+        <path d="M-50,-5 q50,30 100,0" fill="none" stroke="#0d1a02" stroke-width="2" opacity="0.6"/>
+        <path d="M-40,20 q40,20 80,0" fill="none" stroke="#0d1a02" stroke-width="2" opacity="0.4"/>
+        <path d="M-46,28 L-30,52 L-18,28 L-6,52 L6,28 L18,52 L30,28 L46,52 L52,40 L48,28 Z"
+              fill="#0d1a02" stroke="#ff3b6b" stroke-width="1.2"/>
+        <ellipse cx="-30" cy="-12" rx="14" ry="9" fill="#0d1a02"/>
+        <ellipse cx="-30" cy="-12" rx="7" ry="4" fill="#ffb347"/>
+        <ellipse cx="30"  cy="-12" rx="14" ry="9" fill="#0d1a02"/>
+        <ellipse cx="30"  cy="-12" rx="7" ry="4" fill="#ffb347"/>
+      </svg>`;
+
+    case 4: // TITAN
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g4" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#dff58a"/>
+            <stop offset="40%" stop-color="#6a9923"/>
+            <stop offset="100%" stop-color="#0a1903"/>
+          </radialGradient>
+          <filter id="glow4" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+        </defs>
+        <path d="M-70,-40 L-50,-90 L-30,-50 L-10,-95 L10,-50 L30,-95 L50,-50 L70,-90 L60,-30 Z"
+              fill="#0a1903" stroke="#5a8a1d" stroke-width="1.5"/>
+        <path d="M-80,30 Q-80,-20 -50,-30 Q-20,-60 0,-50 Q20,-60 50,-30 Q80,-20 80,30 Q60,80 0,80 Q-60,80 -80,30 Z"
+              fill="url(#g4)" stroke="#0a1903" stroke-width="2.5"/>
+        <path d="M-50,-10 L-30,0 L-50,10 Z" fill="#0a1903" opacity="0.5"/>
+        <path d="M50,-10  L30,0  L50,10 Z"  fill="#0a1903" opacity="0.5"/>
+        <path d="M-20,20 L0,30 L20,20 L0,45 Z" fill="#0a1903" opacity="0.6"/>
+        <g fill="#b4ff39" filter="url(#glow4)">
+          <circle cx="-40" cy="-5" r="4"/>
+          <circle cx="-15" cy="-15" r="4"/>
+          <circle cx="0" cy="-5" r="5"/>
+          <circle cx="15" cy="-15" r="4"/>
+          <circle cx="40" cy="-5" r="4"/>
+        </g>
+        <g fill="#fff">
+          <circle cx="-40" cy="-5" r="1.5"/>
+          <circle cx="-15" cy="-15" r="1.5"/>
+          <circle cx="0" cy="-5" r="2"/>
+          <circle cx="15" cy="-15" r="1.5"/>
+          <circle cx="40" cy="-5" r="1.5"/>
+        </g>
+        <path d="M-30,50 L-20,68 L-10,52 L0,70 L10,52 L20,68 L30,50 Z"
+              fill="#0a1903" stroke="#ff3b6b" stroke-width="1.5"/>
+      </svg>`;
+
+    case 5: // ELDRITCH
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g5" cx="50%" cy="50%">
+            <stop offset="0%" stop-color="#c89bff"/>
+            <stop offset="40%" stop-color="#5a2eaa"/>
+            <stop offset="100%" stop-color="#0a0418"/>
+          </radialGradient>
+          <filter id="glow5">
+            <feGaussianBlur stdDeviation="2.5"/>
+          </filter>
+        </defs>
+        <g stroke="#1a0838" stroke-width="6" fill="none" stroke-linecap="round">
+          <path d="M-30,-30 Q-80,-60 -90,-90"/>
+          <path d="M30,-30 Q80,-60 90,-90"/>
+          <path d="M-50,30 Q-95,40 -90,90"/>
+          <path d="M50,30 Q95,40 90,90"/>
+          <path d="M0,-40 Q-15,-90 10,-95"/>
+          <path d="M-20,40 Q-30,90 -5,95"/>
+          <path d="M20,40 Q30,90 5,95"/>
+        </g>
+        <circle cx="0" cy="0" r="58" fill="url(#g5)" stroke="#0a0418" stroke-width="2"/>
+        <circle cx="0" cy="0" r="40" fill="none" stroke="#1a0838" stroke-width="1.5" opacity="0.6"/>
+        <circle cx="0" cy="0" r="28" fill="none" stroke="#1a0838" stroke-width="1.5" opacity="0.6"/>
+        <ellipse cx="0" cy="0" rx="22" ry="14" fill="#0a0418"/>
+        <ellipse cx="0" cy="0" rx="18" ry="10" fill="#ff3b6b" filter="url(#glow5)"/>
+        <ellipse cx="0" cy="0" rx="6" ry="10" fill="#0a0418"/>
+        <g fill="#b4ff39" filter="url(#glow5)">
+          <circle cx="-32" cy="-22" r="3"/>
+          <circle cx="32"  cy="-22" r="3"/>
+          <circle cx="-38" cy="20"  r="2.5"/>
+          <circle cx="38"  cy="20"  r="2.5"/>
+          <circle cx="-12" cy="38"  r="2"/>
+          <circle cx="12"  cy="38"  r="2"/>
+        </g>
+        <g fill="#5a2eaa" stroke="#1a0838" stroke-width="1.5">
+          <circle cx="-90" cy="-90" r="6"/>
+          <circle cx="90"  cy="-90" r="6"/>
+          <circle cx="-90" cy="90"  r="6"/>
+          <circle cx="90"  cy="90"  r="6"/>
+        </g>
+      </svg>`;
+  }
+}
+
+// ---------- RENDER ----------
+const el = {
+  biomass:   document.getElementById('ui-biomass'),
+  cps:       document.getElementById('ui-cps'),
+  pps:       document.getElementById('ui-pps'),
+  fk:        document.getElementById('ui-fk'),
+  monster:   document.getElementById('monster-art'),
+  stageLabel:document.getElementById('stage-label'),
+  stageName: document.getElementById('stage-name'),
+  stageCur:  document.getElementById('stage-progress-cur'),
+  stageNeed: document.getElementById('stage-progress-need'),
+  stageFill: document.getElementById('stage-bar-fill'),
+  clickPop:  document.getElementById('ui-click-pop'),
+  lifetime:  document.getElementById('lifetime-display'),
+  mutList:   document.getElementById('mutations-list'),
+  upList:    document.getElementById('upgrades-list'),
+  prestige:  document.getElementById('prestige-btn'),
+  modalFK:   document.getElementById('modal-fk-cur'),
+  modalGain: document.getElementById('modal-fk-gain'),
+  perksGrid: document.getElementById('perks-grid'),
+  doBreach:  document.getElementById('do-breach'),
+};
+
+let lastStageRendered = -1;
+
+function renderMonster(force=false) {
+  const idx = currentStage();
+  if (idx !== lastStageRendered || force) {
+    el.monster.innerHTML = svgFor(idx);
+    if (lastStageRendered !== -1 && idx > lastStageRendered) {
+      triggerEvolutionFlash();
+      toast('EVOLVED -> ' + STAGES[idx].name.toUpperCase());
     }
+    lastStageRendered = idx;
+    state.stage = idx;
+  }
+  el.stageLabel.textContent = 'STAGE ' + (idx+1) + ' / ' + STAGES.length;
+  el.stageName.textContent  = STAGES[idx].name;
 
-    function endGame() {
-        clearInterval(gameInterval);
-        clearTimeout(customerSpawnTimeout);
-        activeQueues.forEach(c => clearInterval(c.intervalId));
-        document.getElementById('final-score').innerText = `Your Final Score: ${score}`;
-        document.getElementById('game-over-screen').style.display = 'flex';
+  const nextIdx = Math.min(idx+1, STAGES.length-1);
+  const curThr  = STAGES[idx].threshold;
+  const nextThr = STAGES[nextIdx].threshold;
+  if (idx === STAGES.length-1) {
+    el.stageCur.textContent  = fmt(state.lifetime);
+    el.stageNeed.textContent = 'inf apex';
+    el.stageFill.style.width = '100%';
+  } else {
+    const prog = Math.min(1, (state.lifetime - curThr) / (nextThr - curThr));
+    el.stageCur.textContent  = fmt(state.lifetime);
+    el.stageNeed.textContent = '-> ' + fmt(nextThr);
+    el.stageFill.style.width = (prog*100).toFixed(2) + '%';
+  }
+}
+
+function triggerEvolutionFlash() {
+  const wrap = document.getElementById('monster-wrap');
+  const f = document.createElement('div');
+  f.className = 'evo-flash';
+  wrap.appendChild(f);
+  setTimeout(()=>f.remove(), 1400);
+  playSound('evolve');
+}
+
+function buildLists() {
+  el.mutList.innerHTML = MUTATIONS.map(m => mutationCardHTML(m)).join('');
+  el.upList.innerHTML  = UPGRADES.map(u => upgradeCardHTML(u)).join('');
+
+  MUTATIONS.forEach(m => {
+    const node = document.querySelector('[data-mut="' + m.id + '"]');
+    if (node) node.addEventListener('click', () => buyMutation(m.id));
+  });
+  UPGRADES.forEach(u => {
+    const node = document.querySelector('[data-up="' + u.id + '"]');
+    if (node) node.addEventListener('click', () => buyUpgrade(u.id));
+  });
+}
+
+function mutationCardHTML(m) {
+  return '<div class="card" data-mut="' + m.id + '">' +
+    '<div class="card-row">' +
+      '<div class="card-icon">' + m.icon + '</div>' +
+      '<div class="card-info">' +
+        '<div class="card-name">' + m.name + '</div>' +
+        '<div class="card-desc">' + m.desc + '</div>' +
+        '<div class="card-meta">' +
+          '<span>lv <b id="mut-lv-' + m.id + '">0</b>/' + m.max + '</span>' +
+          '<span>+<b id="mut-pwr-' + m.id + '">' + fmt(m.power) + '</b>/click</span>' +
+          '<span class="cost" id="mut-cost-' + m.id + '">cost: --</span>' +
+        '</div>' +
+        '<div class="progress"><div class="progress-fill" id="mut-bar-' + m.id + '" style="width:0%"></div></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function upgradeCardHTML(u) {
+  return '<div class="card" data-up="' + u.id + '">' +
+    '<div class="card-row">' +
+      '<div class="card-icon">' + u.icon + '</div>' +
+      '<div class="card-info">' +
+        '<div class="card-name">' + u.name + '</div>' +
+        '<div class="card-desc">' + u.desc + '</div>' +
+        '<div class="card-meta">' +
+          '<span>lv <b id="up-lv-' + u.id + '">0</b>/' + u.max + '</span>' +
+          '<span>+<b id="up-rate-' + u.id + '">' + fmt(u.rate) + '</b>/s ea.</span>' +
+          '<span class="cost" id="up-cost-' + u.id + '">cost: --</span>' +
+        '</div>' +
+        '<div class="progress"><div class="progress-fill" id="up-bar-' + u.id + '" style="width:0%"></div></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function refreshCards() {
+  const bm = state.biomass;
+  for (const m of MUTATIONS) {
+    const owned = state.mutations[m.id] || 0;
+    const maxed = owned >= m.max;
+    const c = costOf(m, owned);
+    const node = document.querySelector('[data-mut="' + m.id + '"]');
+    document.getElementById('mut-lv-' + m.id).textContent = owned;
+    const costEl = document.getElementById('mut-cost-' + m.id);
+    costEl.textContent = maxed ? 'apex' : ('cost: ' + fmt(c));
+    costEl.className = 'cost ' + (maxed ? '' : (bm >= c ? 'ok' : 'bad'));
+    document.getElementById('mut-bar-' + m.id).style.width = (Math.min(1, owned/m.max)*100).toFixed(1) + '%';
+    if (node) {
+      node.classList.toggle('affordable', !maxed && bm >= c);
+      node.classList.toggle('maxed', maxed);
+      node.classList.toggle('locked', !maxed && bm < c * 0.05 && owned === 0 && m.base > 1000);
     }
-
-    // Customer System Mechanics
-    function spawnCustomer() {
-        if (timeLeft <= 5) return;
-
-        if (activeQueues.length < 4) {
-            const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
-            const randomAvatar = customerAvatars[Math.floor(Math.random() * customerAvatars.length)];
-           
-            const customer = {
-                id: Date.now() + Math.random(),
-                avatar: randomAvatar,
-                recipe: randomRecipe,
-                patience: 100,
-                maxPatienceTime: 15000 + (Math.random() * 5000) // 15-20 Seconds
-            };
-
-            activeQueues.push(customer);
-            renderCustomers();
-
-            // Dynamic Patience Tracking
-            const tickRate = 100;
-            const lossPerTick = (100 / (customer.maxPatienceTime / tickRate));
-           
-            customer.intervalId = setInterval(() => {
-                customer.patience -= lossPerTick;
-                const fillEl = document.getElementById(`patience-fill-${customer.id}`);
-                if (fillEl) {
-                    fillEl.style.width = `${customer.patience}%`;
-                    if (customer.patience < 30) fillEl.style.backgroundColor = '#ee5253';
-                    else if (customer.patience < 60) fillEl.style.backgroundColor = '#feca57';
-                }
-
-                if (customer.patience <= 0) {
-                    clearInterval(customer.intervalId);
-                    leaveCustomer(customer.id, false);
-                }
-            }, tickRate);
-        }
-
-        // Randomly chain next wave
-        customerSpawnTimeout = setTimeout(spawnCustomer, 3000 + Math.random() * 4000);
+  }
+  for (const u of UPGRADES) {
+    const owned = state.upgrades[u.id] || 0;
+    const maxed = owned >= u.max;
+    const c = costOf(u, owned);
+    const node = document.querySelector('[data-up="' + u.id + '"]');
+    document.getElementById('up-lv-' + u.id).textContent = owned;
+    const costEl = document.getElementById('up-cost-' + u.id);
+    costEl.textContent = maxed ? 'apex' : ('cost: ' + fmt(c));
+    costEl.className = 'cost ' + (maxed ? '' : (bm >= c ? 'ok' : 'bad'));
+    document.getElementById('up-bar-' + u.id).style.width = (Math.min(1, owned/u.max)*100).toFixed(1) + '%';
+    if (node) {
+      node.classList.toggle('affordable', !maxed && bm >= c);
+      node.classList.toggle('maxed', maxed);
+      node.classList.toggle('locked', !maxed && bm < c * 0.05 && owned === 0 && u.base > 1000);
     }
+  }
+}
 
-    function renderCustomers() {
-        const zone = document.getElementById('customers-zone');
-        zone.innerHTML = '';
-        activeQueues.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'customer';
-            div.innerHTML = `
-                <div class="bubble">Want: ${c.recipe.name}<br>${c.recipe.served}</div>
-                <div class="avatar">${c.avatar}</div>
-                <div class="patience-bar"><div id="patience-fill-${c.id}" class="patience-fill"></div></div>
-            `;
-            // Quick-click serve mechanism directly onto customer bounds
-            div.onclick = () => tryServeCustomer(c);
-            zone.appendChild(div);
-        });
-    }
+function refreshHeader() {
+  el.biomass.textContent = fmt(state.biomass);
+  el.cps.textContent     = fmt(computeClickPower());
+  el.pps.textContent     = fmt(computePassive()) + '/s';
+  el.fk.textContent      = fmt(state.fk);
+  el.clickPop.textContent= fmt(computeClickPower());
+  el.lifetime.textContent= 'lifetime: ' + fmt(state.grandLifetime);
 
-    function leaveCustomer(id, servedSuccessful) {
-        activeQueues = activeQueues.filter(c => {
-            if (c.id === id) {
-                clearInterval(c.intervalId);
-                return false;
-            }
-            return true;
-        });
-        if (servedSuccessful) score += 100;
-        document.getElementById('score-display').innerText = `Score: ${score}`;
-        renderCustomers();
-    }
+  const gain = fkOnBreach();
+  el.prestige.disabled = gain < 1;
+  el.prestige.textContent = gain >= 1 ? ('// THE BREACH (+' + fmt(gain) + ' FK) //') : '// THE BREACH //';
+}
 
-    // Kitchen Cooking Logic Matrix
-    function interactStove(ingredient) {
-        selectedIngredient = ingredient;
-    }
+function refreshAll() {
+  refreshHeader();
+  refreshCards();
+  renderMonster();
+}
 
-    function clickStove(index) {
-        let stove = stoves[index];
-        const el = document.getElementById(`stove-${index}`);
-        const barFill = el.querySelector('.stove-timer-fill');
+// ---------- ACTIONS ----------
+function buyMutation(id) {
+  const m = MUTATIONS.find(x=>x.id===id);
+  const owned = state.mutations[id] || 0;
+  if (owned >= m.max) return;
+  const c = costOf(m, owned);
+  if (state.biomass < c) return;
+  state.biomass -= c;
+  state.mutations[id] = owned + 1;
+  playSound('buy');
+  refreshAll();
+}
 
-        if (stove.status === 'idle' && selectedIngredient) {
-            // Put raw ingredient to stove
-            stove.status = 'cooking';
-            stove.food = selectedIngredient;
-            selectedIngredient = null;
-            el.className = 'stove cooking';
-            el.innerHTML = `Cooking...<br><span style="font-size:24px">${stove.food}</span><div class="stove-timer"><div class="stove-timer-fill"></div></div>`;
-            el.querySelector('.stove-timer').style.display = 'block';
+function buyUpgrade(id) {
+  const u = UPGRADES.find(x=>x.id===id);
+  const owned = state.upgrades[id] || 0;
+  if (owned >= u.max) return;
+  const c = costOf(u, owned);
+  if (state.biomass < c) return;
+  state.biomass -= c;
+  state.upgrades[id] = owned + 1;
+  playSound('buy');
+  refreshAll();
+}
 
-            let elapsed = 0;
-            let currentBar = el.querySelector('.stove-timer-fill');
-           
-            stove.timer = setInterval(() => {
-                elapsed += 100;
-                let pct = (elapsed / COOK_TIME) * 100;
-                currentBar.style.width = `${pct}%`;
+// CLICK!
+function onMonsterClick(e) {
+  const power = computeClickPower();
+  state.biomass += power;
+  state.lifetime += power;
+  state.grandLifetime += power;
 
-                if (elapsed >= COOK_TIME) {
-                    clearInterval(stove.timer);
-                    triggerCooked(index);
-                }
-            }, 100);
-        }
-        else if (stove.status === 'cooked') {
-            // Collect completed base food item to an empty plate
-            let targetPlate = plates.find(p => p.items.length === 0 || (p.items.length === 1 && p.items[0] === stove.food));
-            let openIdx = plates.indexOf(targetPlate);
-           
-            if (openIdx !== -1) {
-                plates[openIdx].items.push(stove.food);
-                updatePlateDisplay(openIdx);
-                resetStove(index);
-            }
-        }
-        else if (stove.status === 'burned') {
-            // Tap to clear out charred food waste
-            resetStove(index);
-        }
-    }
+  // squish anim
+  el.monster.classList.remove('squish');
+  void el.monster.offsetWidth; // restart anim
+  el.monster.classList.add('squish');
 
-    function triggerCooked(index) {
-        let stove = stoves[index];
-        let el = document.getElementById(`stove-${index}`);
-        stove.status = 'cooked';
-        el.className = 'stove cooked';
-        el.innerHTML = `READY!<br><span style="font-size:24px">${stove.food === '🥩' ? '🍖' : '🍣'}</span><div class="stove-timer"><div class="stove-timer-fill" style="background:#10ac84"></div></div>`;
-       
-        let burnElapsed = 0;
-        let currentBar = el.querySelector('.stove-timer-fill');
-       
-        stove.timer = setInterval(() => {
-            burnElapsed += 100;
-            let pct = 100 - ((burnElapsed / BURN_TIME) * 100);
-            currentBar.style.width = `${pct}%`;
+  // ripple
+  const rect = document.getElementById('monster-wrap').getBoundingClientRect();
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = (e.clientX - rect.left) + 'px';
+  r.style.top  = (e.clientY - rect.top) + 'px';
+  document.getElementById('monster-wrap').appendChild(r);
+  setTimeout(()=>r.remove(), 650);
 
-            if (burnElapsed >= BURN_TIME) {
-                clearInterval(stove.timer);
-                stove.status = 'burned';
-                el.className = 'stove burned';
-                el.innerHTML = `BURNED! 🗑️<br><span style="font-size:24px">🪰</span>`;
-            }
-        }, 100);
-    }
+  // floating text at mouse coords
+  const isCrit = Math.random() < 0.05;
+  spawnFloater(e.clientX, e.clientY, '+' + fmt(isCrit ? power * 5 : power), isCrit);
+  if (isCrit) {
+    const bonus = power * 4; // already counted base power above
+    state.biomass += bonus; state.lifetime += bonus; state.grandLifetime += bonus;
+  }
+  playSound('click');
+}
 
-    function resetStove(index) {
-        if (stoves[index].timer) clearInterval(stoves[index].timer);
-        stoves[index] = { id: index, status: 'idle', food: null, progress: 0, timer: null };
-        const el = document.getElementById(`stove-${index}`);
-        if(el) {
-            el.className = 'stove';
-            el.innerHTML = 'Empty';
-        }
-    }
+function spawnFloater(x, y, text, crit) {
+  const f = document.createElement('div');
+  f.className = 'floater' + (crit ? ' crit' : '');
+  f.textContent = text + (crit ? ' !!' : '');
+  f.style.left = x + 'px';
+  f.style.top  = y + 'px';
+  f.style.transform = 'translate(-50%, -50%) translateX(' + ((Math.random()-0.5)*24) + 'px)';
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(), 950);
+}
 
-    // Assembly & Recipe Construction
-    function addTopping(topping) {
-        // Find plates that have base raw meats cooked but do not have this topping yet
-        let targetPlate = plates.find(p => p.items.length > 0 && !p.items.includes(topping));
-        if (targetPlate) {
-            let idx = plates.indexOf(targetPlate);
-            plates[idx].items.push(topping);
-            updatePlateDisplay(idx);
-        }
-    }
+el.monster.addEventListener('mousedown', onMonsterClick);
 
-    function updatePlateDisplay(index) {
-        let plate = plates[index];
-        let el = document.getElementById(`plate-${index}`);
-       
-        // Match visual representations
-        let visual = "🍽️";
-        if (plate.items.includes('🥩')) visual = '🍖';
-        if (plate.items.includes('🐟')) visual = '🍣';
-        if (plate.items.includes('🧀') && plate.items.includes('🥩')) visual = '🍔';
-        if (plate.items.includes('🍅') && plate.items.includes('🐟')) visual = '🍲';
+// ---------- GAME LOOP @ ~60fps ----------
+let lastT = performance.now();
+let cardTick = 0;
+function loop(now) {
+  const dt = Math.min(0.25, (now - lastT) / 1000);
+  lastT = now;
 
-        plate.display = visual;
-        el.className = 'plate has-food';
-        el.innerHTML = `<span class="plate-food">${visual}</span><br><span style="font-size:10px">${plate.items.join('+')}</span>`;
-    }
+  const pps = computePassive();
+  const earned = pps * dt;
+  if (earned > 0) {
+    state.biomass += earned;
+    state.lifetime += earned;
+    state.grandLifetime += earned;
+  }
 
-    function clickPlate(index) {
-        // Tapping an active food item plate directly flushes / trashes the contents
-        if (plates[index].items.length > 0) {
-            resetPlate(index);
-        }
-    }
+  refreshHeader();
+  cardTick += dt;
+  if (cardTick > 0.15) { refreshCards(); renderMonster(); cardTick = 0; }
 
-    function resetPlate(index) {
-        plates[index] = { id: index, items: [], display: "" };
-        const el = document.getElementById(`plate-${index}`);
-        if(el) {
-            el.className = 'plate';
-            el.innerHTML = 'Empty';
-        }
-    }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 
-    // Fulfillment Verification
-    function tryServeCustomer(customer) {
-        // Match contents across active work stations
-        let matchedPlateIdx = plates.findIndex(p => {
-            if (p.items.length !== customer.recipe.items.length) return false;
-            return customer.recipe.items.every(item => p.items.includes(item));
-        });
+// ---------- PRESTIGE ----------
+const prestigeModal = document.getElementById('prestige-modal');
+el.prestige.addEventListener('click', openPrestige);
+document.getElementById('prestige-close').addEventListener('click', ()=>prestigeModal.classList.remove('show'));
+prestigeModal.addEventListener('click', e => { if (e.target === prestigeModal) prestigeModal.classList.remove('show'); });
 
-        if (matchedPlateIdx !== -1) {
-            resetPlate(matchedPlateIdx);
-            leaveCustomer(customer.id, true);
-        }
-    }
+function openPrestige() {
+  renderPerks();
+  el.modalFK.textContent  = fmt(state.fk);
+  el.modalGain.textContent= fmt(fkOnBreach());
+  el.doBreach.disabled = fkOnBreach() < 1;
+  prestigeModal.classList.add('show');
+}
+
+function renderPerks() {
+  el.perksGrid.innerHTML = PERKS.map(p => {
+    const lv = state.perks[p.id] || 0;
+    const maxed = lv >= p.max;
+    const c = perkCost(p);
+    return '<div class="perk ' + (maxed?'maxed':'') + '" data-perk="' + p.id + '">' +
+      '<div class="perk-name">' + p.name + '</div>' +
+      '<div class="perk-desc">' + p.desc + '</div>' +
+      '<div class="perk-meta">' +
+        '<span class="lvl">lv ' + lv + ' / ' + p.max + '</span>' +
+        '<span class="cost ' + (maxed?'':(state.fk>=c?'ok':'bad')) + '">' +
+          (maxed?'APEX':(fmt(c) + ' FK')) +
+        '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  PERKS.forEach(p => {
+    const node = el.perksGrid.querySelector('[data-perk="' + p.id + '"]');
+    if (node) node.addEventListener('click', () => buyPerk(p.id));
+  });
+}
+
+function buyPerk(id) {
+  const p = PERKS.find(x=>x.id===id);
+  const lv = state.perks[id] || 0;
+  if (lv >= p.max) return;
+  const c = perkCost(p);
+  if (state.fk < c) return;
+  state.fk -= c;
+  state.perks[id] = lv + 1;
+  renderPerks();
+  el.modalFK.textContent = fmt(state.fk);
+  refreshAll();
+  playSound('perk');
+  toast('PERK ACQUIRED');
+}
+
+document.getElementById('do-breach').addEventListener('click', () => {
+  const gain = fkOnBreach();
+  if (gain < 1) return;
+  state.fk += gain;
+  const keep = { fk: state.fk, perks: state.perks, grandLifetime: state.grandLifetime };
+  state = DEFAULT_STATE();
+  state.fk = keep.fk;
+  state.perks = keep.perks;
+  state.grandLifetime = keep.grandLifetime;
+  const startBM = perkBundle().startBiomass;
+  state.biomass = startBM;
+  state.lifetime = startBM;
+  prestigeModal.classList.remove('show');
+  toast('BREACH COMPLETE +' + fmt(gain) + ' FK');
+  refreshAll();
+  save();
+});
+
+// ---------- ADMIN CONSOLE ----------
+const adminBox = document.getElementById('admin');
+const adminInput = document.getElementById('admin-input');
+const adminLog = document.getElementById('admin-log');
+
+document.getElementById('admin-toggle').addEventListener('click', toggleAdmin);
+document.getElementById('admin-close').addEventListener('click', () => adminBox.classList.remove('show'));
+document.addEventListener('keydown', e => {
+  if (e.key === '`' || e.key === '~') {
+    if (document.activeElement === adminInput) return;
+    e.preventDefault();
+    toggleAdmin();
+  } else if (e.key === 'Escape') {
+    adminBox.classList.remove('show');
+    prestigeModal.classList.remove('show');
+  }
+});
+function toggleAdmin() {
+  adminBox.classList.toggle('show');
+  if (adminBox.classList.contains('show')) setTimeout(()=>adminInput.focus(), 50);
+}
+
+const CHEATS = {
+  GREEDISGOOD: () => { state.biomass += 1e6; state.lifetime += 1e6; state.grandLifetime += 1e6;
+                       return '+1,000,000 biomass injected.'; },
+  EVOLVENOW:   () => { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
+                       return 'all active mutations forced to apex.'; },
+  FASTFORWARD: () => { state.passiveMultCheat *= 10;
+                       return 'passive multiplier x' + state.passiveMultCheat + ' (permanent this run).'; },
+  GODMODE:     () => { state.godMode = !state.godMode;
+                       return 'godmode = ' + state.godMode + '. all costs ' + (state.godMode?'-> 0.':'restored.'); },
+  HELP:        () => 'codes: GREEDISGOOD, EVOLVENOW, FASTFORWARD, GODMODE, BREACHME.',
+  BREACHME:    () => { state.grandLifetime += 1e15; return '+ huge lifetime added. now breach.'; },
+};
+
+adminInput.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const raw = adminInput.value.trim();
+  if (!raw) return;
+  const code = raw.toUpperCase();
+  adminInput.value = '';
+  let line;
+  if (CHEATS[code]) {
+    const msg = CHEATS[code]();
+    line = '<div class="ok">&gt; ' + code + ' :: ' + msg + '</div>';
+    refreshAll();
+  } else {
+    line = '<div class="err">&gt; ' + code + ' :: unknown override.</div>';
+  }
+  adminLog.innerHTML = line + adminLog.innerHTML;
+});
+
+// ---------- TOAST ----------
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+// ---------- SOUND (WebAudio synth, no files needed) ----------
+let audioCtx = null;
+function ensureCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
+  }
+  return audioCtx;
+}
+function playSound(name) {
+  const ctx = ensureCtx();
+  if (!ctx) return;
+  const presets = {
+    click:  { type:'square',   freq:380, dur:0.05, vol:0.06, slide:-80 },
+    buy:    { type:'triangle', freq:520, dur:0.12, vol:0.10, slide: 120 },
+    perk:   { type:'sawtooth', freq:240, dur:0.25, vol:0.12, slide: 240 },
+    evolve: { type:'sawtooth', freq:160, dur:0.6,  vol:0.18, slide: 320 },
+  };
+  const p = presets[name] || presets.click;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = p.type;
+  o.frequency.setValueAtTime(p.freq, ctx.currentTime);
+  o.frequency.linearRampToValueAtTime(p.freq + p.slide, ctx.currentTime + p.dur);
+  g.gain.setValueAtTime(p.vol, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + p.dur);
+  o.connect(g).connect(ctx.destination);
+  o.start();
+  o.stop(ctx.currentTime + p.dur);
+}
+
+// ---------- SAVE / LOAD ----------
+const SAVE_KEY = 'mutationLabGenesis.v1';
+function save() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+  catch(e) {}
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    state = Object.assign(DEFAULT_STATE(), parsed);
+    for (const m of MUTATIONS) if (state.mutations[m.id] == null) state.mutations[m.id] = 0;
+    for (const u of UPGRADES)  if (state.upgrades[u.id]  == null) state.upgrades[u.id]  = 0;
+    for (const p of PERKS)     if (state.perks[p.id]     == null) state.perks[p.id]     = 0;
+    return true;
+  } catch(e) { return false; }
+}
+
+document.getElementById('save-btn').addEventListener('click', () => { save(); toast('SAVED'); });
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (!confirm('Wipe ALL progress including Forbidden Knowledge and perks? This is permanent.')) return;
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+  state = DEFAULT_STATE();
+  refreshAll();
+  toast('HARD RESET');
+});
+
+setInterval(save, 15000);
+window.addEventListener('beforeunload', save);
+
+// ---------- BOOTSTRAP ----------
+function start() {
+  load();
+  buildLists();
+  refreshAll();
+}
+start();
+
 </script>
 </body>
 </html>
