@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#07090a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Mutation Lab" />
 <title>MUTATION LAB :: GENESIS</title>
 
 <!--
@@ -52,18 +57,18 @@
 <style>
 /* ====================== CORE TOKENS ====================== */
 :root {
-  --bg-0: #07090a;
-  --bg-1: #0c1112;
-  --bg-2: #131a1b;
-  --line: #1e2a2b;
-  --acid: #b4ff39;
-  --acid-dim: #6a9923;
-  --rot: #8a5cff;
-  --blood: #ff3b6b;
-  --bone: #e6f0c2;
-  --muted: #6b7a6e;
-  --warn: #ffb347;
-  --shadow-glow: 0 0 24px rgba(180, 255, 57, 0.35);
+  --bg-0: #131a1c;
+  --bg-1: #1a2225;
+  --bg-2: #232d30;
+  --line: #344244;
+  --acid: #c8ff5a;
+  --acid-dim: #8ec232;
+  --rot: #bf9fff;
+  --blood: #ff5577;
+  --bone: #ecf5d4;
+  --muted: #8a9a8d;
+  --warn: #ffc266;
+  --shadow-glow: 0 0 24px rgba(200, 255, 90, 0.4);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -79,6 +84,19 @@ html, body {
   cursor: crosshair;
 }
 
+/* ====================== MOBILE / TOUCH FOUNDATION ====================== */
+* { -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: contain; }
+button, .card, .perk, #monster-art, #yes-sir, #credits-close-btn,
+.io-btn, #prestige-btn, #admin-toggle, #briefing-toggle, #credits-toggle,
+.modal-close { touch-action: manipulation; }
+input { font-size: 16px; /* prevents iOS zoom on focus */ }
+/* on touch devices, drop the crosshair cursor — irrelevant */
+@media (hover: none) and (pointer: coarse) {
+  body { cursor: default; }
+  #monster-art { cursor: default; }
+}
+
 /* CRT scanline + grain overlay */
 body::before {
   content: '';
@@ -86,9 +104,9 @@ body::before {
   pointer-events: none;
   background:
     repeating-linear-gradient(
-      0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px
+      0deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 3px
     ),
-    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.25) 100%);
   z-index: 9999;
   mix-blend-mode: multiply;
 }
@@ -97,7 +115,7 @@ body::after {
   position: fixed; inset: 0;
   pointer-events: none;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.7  0 0 0 0 0.9  0 0 0 0 0.3  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  opacity: 0.5;
+  opacity: 0.2;
   z-index: 9998;
 }
 
@@ -122,7 +140,7 @@ body::after {
 
 header.bar {
   grid-area: header;
-  background: linear-gradient(180deg, #0a0e0f 0%, #050708 100%);
+  background: linear-gradient(180deg, #1d262a 0%, #131a1c 100%);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px;
   border-bottom: 1px solid var(--acid-dim);
@@ -154,7 +172,7 @@ header.bar::after {
 .stat label { color: var(--muted); display: block; font-size: 9px; }
 .stat .val { color: var(--bone); font-size: 16px; font-weight: 600; }
 .stat .val.big { color: var(--acid); text-shadow: 0 0 8px rgba(180,255,57,0.4); }
-.stat .val.fk { color: var(--rot); text-shadow: 0 0 8px rgba(138,92,255,0.4); }
+.stat .val.fk { color: var(--rot); text-shadow: 0 0 8px rgba(191,159,255,0.4); }
 
 /* ====================== PANELS ====================== */
 .panel {
@@ -209,7 +227,7 @@ header.bar::after {
 .card-row { display: flex; align-items: center; gap: 10px; }
 .card-icon {
   width: 36px; height: 36px; flex-shrink: 0;
-  background: #050807;
+  background: #0e1518;
   border: 1px solid var(--line);
   display: grid; place-items: center;
   font-size: 18px;
@@ -229,7 +247,7 @@ header.bar::after {
 
 .progress {
   height: 3px;
-  background: #050807;
+  background: #0e1518;
   margin-top: 8px;
   position: relative;
   overflow: hidden;
@@ -249,8 +267,8 @@ header.bar::after {
 .stage {
   grid-area: stage;
   background:
-    radial-gradient(circle at 50% 55%, rgba(180,255,57,0.08) 0%, transparent 55%),
-    radial-gradient(circle at 30% 80%, rgba(138,92,255,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 55%, rgba(200,255,90,0.16) 0%, transparent 55%),
+    radial-gradient(circle at 30% 80%, rgba(191,159,255,0.14) 0%, transparent 50%),
     var(--bg-0);
   position: relative;
   overflow: hidden;
@@ -369,7 +387,7 @@ header.bar::after {
   display: flex; justify-content: space-between; margin-bottom: 4px;
 }
 .stage-bar {
-  height: 4px; background: #050807; border: 1px solid var(--line);
+  height: 4px; background: #0e1518; border: 1px solid var(--line);
   overflow: hidden; position: relative;
 }
 .stage-bar-fill {
@@ -382,7 +400,7 @@ header.bar::after {
 /* ====================== FOOTER ====================== */
 footer.bar {
   grid-area: footer;
-  background: #050708;
+  background: #0e1518;
   border-top: 1px solid var(--line);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px;
@@ -400,12 +418,12 @@ footer.bar {
   letter-spacing: 4px;
   cursor: pointer;
   position: relative;
-  text-shadow: 0 0 6px rgba(138,92,255,0.5);
+  text-shadow: 0 0 6px rgba(191,159,255,0.5);
   transition: all 0.2s;
 }
 #prestige-btn:hover:not(:disabled) {
   background: linear-gradient(180deg, #2a1655, #0a0419);
-  box-shadow: 0 0 20px rgba(138,92,255,0.5);
+  box-shadow: 0 0 20px rgba(191,159,255,0.5);
 }
 #prestige-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
@@ -419,7 +437,7 @@ footer.bar {
 /* ====================== MODAL (PRESTIGE TREE) ====================== */
 .modal-backdrop {
   position: fixed; inset: 0;
-  background: rgba(5, 7, 8, 0.85);
+  background: rgba(15, 22, 25, 0.78);
   backdrop-filter: blur(4px);
   display: none;
   z-index: 1000;
@@ -433,7 +451,7 @@ footer.bar {
   max-height: 88vh; overflow-y: auto;
   background: var(--bg-1);
   border: 1px solid var(--rot);
-  box-shadow: 0 0 40px rgba(138,92,255,0.3);
+  box-shadow: 0 0 40px rgba(191,159,255,0.3);
   padding: 26px;
   position: relative;
 }
@@ -481,23 +499,23 @@ footer.bar {
   font-family: 'Major Mono Display', monospace; letter-spacing: 6px; font-size: 14px;
   cursor: pointer;
 }
-.do-breach:hover:not(:disabled) { background: rgba(138,92,255,0.15); box-shadow: 0 0 20px rgba(138,92,255,0.3); }
+.do-breach:hover:not(:disabled) { background: rgba(191,159,255,0.15); box-shadow: 0 0 20px rgba(191,159,255,0.3); }
 .do-breach:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* ====================== ADMIN CONSOLE ====================== */
 #admin-toggle {
   position: fixed; bottom: 6px; left: 6px; z-index: 500;
-  background: transparent; border: none; color: var(--line);
+  background: transparent; border: none; color: var(--acid);
   font-size: 10px; cursor: pointer; font-family: inherit;
-  letter-spacing: 1px;
+  letter-spacing: 1px; text-shadow: 0 0 8px rgba(200,255,90,0.5);
 }
-#admin-toggle:hover { color: var(--acid-dim); }
+#admin-toggle:hover { color: #fff; text-shadow: 0 0 10px rgba(200,255,90,0.8); }
 
 #admin {
   position: fixed; bottom: 12px; left: 12px;
-  width: 320px; background: #000; border: 1px solid var(--acid);
+  width: 320px; background: #1a2628; border: 1px solid var(--acid);
   padding: 14px; z-index: 600; display: none;
-  box-shadow: 0 0 30px rgba(180,255,57,0.2);
+  box-shadow: 0 0 40px rgba(200,255,90,0.35);
   font-family: 'JetBrains Mono', monospace;
 }
 #admin.show { display: block; animation: termOpen 0.2s; }
@@ -506,20 +524,21 @@ footer.bar {
 #admin .term-title {
   font-size: 10px; letter-spacing: 3px; color: var(--acid);
   margin-bottom: 8px; display: flex; justify-content: space-between;
+  text-shadow: 0 0 8px rgba(200,255,90,0.5);
 }
 #admin input {
-  width: 100%; background: #050807; border: 1px solid var(--line); color: var(--acid);
+  width: 100%; background: #232d30; border: 1px solid var(--acid-dim); color: var(--acid);
   padding: 8px; font-family: inherit; font-size: 12px; outline: none;
   letter-spacing: 2px;
 }
-#admin input:focus { border-color: var(--acid); box-shadow: 0 0 8px rgba(180,255,57,0.3); }
+#admin input:focus { border-color: var(--acid); box-shadow: 0 0 12px rgba(200,255,90,0.45); }
 #admin .term-log {
-  margin-top: 8px; font-size: 10px; color: var(--muted);
+  margin-top: 8px; font-size: 10px; color: var(--bone);
   max-height: 100px; overflow-y: auto; line-height: 1.6;
 }
-#admin .term-log .ok { color: var(--acid); }
+#admin .term-log .ok { color: var(--acid); text-shadow: 0 0 6px rgba(200,255,90,0.4); }
 #admin .term-log .err { color: var(--blood); }
-#admin .hint { font-size: 9px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
+#admin .hint { font-size: 9px; color: var(--acid-dim); margin-top: 6px; letter-spacing: 1px; }
 
 /* Toast */
 .toast {
@@ -536,7 +555,7 @@ footer.bar {
 /* Mini-status (top-right of monster) */
 .click-power-pill {
   position: absolute; top: 16px; right: 16px;
-  background: rgba(5,7,8,0.7); border: 1px solid var(--line);
+  background: rgba(15,22,25,0.65); border: 1px solid var(--line);
   padding: 6px 10px; font-size: 10px; letter-spacing: 2px;
   z-index: 5;
 }
@@ -561,6 +580,84 @@ footer.bar {
   z-index: 500; text-transform: uppercase;
 }
 #briefing-toggle:hover { color: var(--gold); }
+
+/* ====================== CREDITS ====================== */
+#credits-toggle {
+  position: fixed; bottom: 12px; left: 192px;
+  background: transparent; border: 0; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer; padding: 6px 10px;
+  z-index: 500; text-transform: uppercase;
+}
+#credits-toggle:hover { color: var(--acid); }
+
+#credits-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(4px);
+  z-index: 1500;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#credits-modal.show { display: flex; animation: briefingFade 0.3s; }
+
+.credits-card {
+  position: relative;
+  width: min(460px, 100%);
+  background: var(--bg-1);
+  border: 1px solid var(--acid);
+  box-shadow: 0 0 60px rgba(180,255,57,0.18), 0 0 0 1px rgba(180,255,57,0.05) inset;
+  padding: 28px 32px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--bone);
+  animation: briefingSlide 0.4s cubic-bezier(0.3,1.2,0.5,1);
+}
+.credits-card::before {
+  content: '// CREDITS //';
+  display: block; text-align: center;
+  font-family: 'Major Mono Display', monospace;
+  font-size: 11px; color: var(--acid); letter-spacing: 6px;
+  padding-bottom: 14px; border-bottom: 1px dashed rgba(180,255,57,0.2);
+  margin-bottom: 18px;
+}
+.credits-card h3 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 20px; color: var(--acid); letter-spacing: 4px;
+  margin: 0 0 4px; text-align: center;
+  text-shadow: 0 0 14px rgba(180,255,57,0.35);
+}
+.credits-card .subtitle {
+  font-size: 10px; color: var(--muted); letter-spacing: 3px;
+  text-align: center; margin-bottom: 20px;
+}
+.credits-list { display: grid; gap: 14px; margin: 6px 0 18px; }
+.credit-row {
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: baseline; gap: 16px;
+  padding: 10px 14px;
+  background: rgba(180,255,57,0.04);
+  border-left: 2px solid var(--acid);
+}
+.credit-role  { font-size: 10px; color: var(--muted); letter-spacing: 2.5px; text-transform: uppercase; }
+.credit-name  { font-size: 16px; color: var(--acid); font-weight: 700; letter-spacing: 1.5px; }
+.credit-name.coder { color: var(--rot); text-shadow: 0 0 10px rgba(191,159,255,0.4); }
+
+.credits-footer {
+  margin-top: 18px;
+  display: flex; justify-content: center;
+}
+#credits-close-btn {
+  background: transparent; color: var(--acid);
+  border: 1px solid var(--acid);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 4px;
+  padding: 8px 22px; cursor: pointer;
+  text-transform: uppercase;
+}
+#credits-close-btn:hover { background: rgba(180,255,57,0.1); box-shadow: 0 0 14px rgba(180,255,57,0.3); }
+.credits-tag {
+  text-align: center; font-size: 9px; color: var(--muted);
+  letter-spacing: 3px; margin-top: 12px; opacity: 0.6;
+}
 
 #briefing-modal {
   position: fixed; inset: 0;
@@ -663,6 +760,139 @@ footer.bar {
 #yes-sir:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--olive-dark), 0 0 24px rgba(255,207,58,0.6); }
 #yes-sir:active { transform: translateY(4px); box-shadow: 0 0 0 var(--olive-dark); }
 
+/* ====================== MOBILE / TABLET LAYOUT ====================== */
+@media (max-width: 760px) {
+  /* HEADER: stack brand above stats */
+  header.bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 14px;
+    gap: 8px;
+    height: auto;
+  }
+  .brand { font-size: 16px; letter-spacing: 4px; }
+  .brand .sub { font-size: 9px; letter-spacing: 2px; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px 10px;
+    width: 100%;
+  }
+  .stat { min-width: 0; overflow: hidden; }
+  .stat .val { font-size: 13px; }
+  .stat .val.big { font-size: 14px; }
+  .stat label { font-size: 8px; }
+
+  /* STAGE: monster smaller on mobile */
+  #monster-wrap {
+    width: min(380px, 86vw);
+    height: min(380px, 46vh);
+  }
+  .stage { min-height: 50vh; padding: 50px 0 30px; }
+  .stage-info { top: 10px; font-size: 9px; }
+  .stage-info .name { font-size: 15px; }
+  .click-power-pill { top: 8px; right: 8px; padding: 4px 8px; font-size: 9px; }
+  .stage-progress { padding: 10px 14px; left: 10px; right: 10px; bottom: 10px; }
+
+  /* PANELS: take their own scroll space */
+  .panel { padding: 12px 12px 24px; max-height: none; }
+  .panel-title { font-size: 12px; letter-spacing: 3px; }
+
+  /* CARDS: bigger tap targets, drop hover lift */
+  .card { padding: 12px; min-height: 56px; }
+  .card:hover { transform: none; }
+
+  /* FOOTER: stack into rows */
+  footer.bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px;
+    height: auto;
+    gap: 10px;
+  }
+  .footer-left, .footer-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .footer-right { justify-content: flex-end; }
+  #prestige-btn {
+    width: 100%;
+    padding: 14px 22px;
+    font-size: 13px;
+    min-height: 48px;
+  }
+  .io-btn { padding: 8px 12px; font-size: 11px; min-height: 36px; }
+
+  /* MODAL: REBIRTH tree */
+  .modal { width: 96vw; padding: 18px; max-height: 90vh; }
+  .modal h2 { font-size: 18px; letter-spacing: 4px; }
+  .perks-grid { grid-template-columns: 1fr; }
+  .fk-pool .value { font-size: 18px; }
+  .do-breach { padding: 14px; min-height: 48px; }
+
+  /* BRIEFING modal scaling */
+  .briefing-card { padding: 22px 18px 18px; }
+  .briefing-header h2 { font-size: 16px; letter-spacing: 2px; }
+  .briefing-text { font-size: 12px; line-height: 1.55; }
+  #yes-sir { font-size: 14px; letter-spacing: 4px; padding: 14px 28px; width: 100%; }
+  .briefing-footer { justify-content: stretch; }
+
+  /* CREDITS modal */
+  .credits-card { padding: 22px 18px 18px; }
+  .credit-name { font-size: 14px; }
+  #credits-close-btn { min-height: 40px; padding: 10px 22px; }
+
+  /* ADMIN console: nearly full width, sit above the toggle row */
+  #admin {
+    width: calc(100vw - 24px);
+    max-width: 420px;
+    bottom: 56px;
+    left: 12px;
+  }
+
+  /* BOTTOM-LEFT toggle row: bigger touch targets */
+  #admin-toggle, #briefing-toggle, #credits-toggle {
+    bottom: 8px; font-size: 11px;
+    padding: 8px 10px; min-height: 36px;
+    background: rgba(15,22,25,0.65);
+    border: 1px solid var(--line);
+  }
+  #briefing-toggle { left: 96px; }
+  #credits-toggle  { left: 200px; }
+}
+
+/* Small phones (≤ 420px) — tighten further */
+@media (max-width: 420px) {
+  .brand { font-size: 13px; letter-spacing: 3px; }
+  .brand .sub { display: none; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat .val { font-size: 12px; }
+  .stat .val.big { font-size: 13px; }
+  #monster-wrap { width: 86vw; height: 280px; }
+  .stage { min-height: 44vh; padding: 48px 0 24px; }
+
+  #admin-toggle, #briefing-toggle, #credits-toggle {
+    font-size: 10px; padding: 7px 8px; letter-spacing: 1px;
+  }
+  #briefing-toggle { left: 82px; }
+  #credits-toggle  { left: 174px; }
+
+  #yes-sir { font-size: 13px; letter-spacing: 3px; }
+  .credits-card h3 { font-size: 17px; }
+  .modal h2 { font-size: 16px; letter-spacing: 3px; }
+}
+
+/* Landscape phones — keep monster reachable */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  header.bar { padding: 6px 14px; }
+  .brand { font-size: 14px; }
+  .stats { grid-template-columns: repeat(4, 1fr); gap: 4px 8px; }
+  #monster-wrap { width: min(280px, 40vw); height: min(280px, 60vh); }
+  .stage { min-height: auto; padding: 40px 0 20px; }
+}
+
 </style>
 </head>
 
@@ -726,7 +956,7 @@ footer.bar {
       <button class="io-btn" id="reset-btn">HARD RESET</button>
       <span id="autosave-tick">autosaves every 15s</span>
     </div>
-    <button id="prestige-btn" disabled>// REBIRTH //</button>
+    <button id="prestige-btn">// REBIRTH //</button>
     <div class="footer-right">
       <span id="lifetime-display">lifetime: 0</span>
     </div>
@@ -851,16 +1081,51 @@ footer.bar {
 <!-- briefing re-trigger button -->
 <button id="briefing-toggle" title="re-read briefing">// briefing</button>
 
+<!-- CREDITS MODAL -->
+<div id="credits-modal">
+  <div class="credits-card">
+    <h3>MUTATION LAB</h3>
+    <div class="subtitle">// GENESIS BUILD //</div>
+    <div class="credits-list">
+      <div class="credit-row">
+        <div>
+          <div class="credit-role">Developer / Owner</div>
+        </div>
+        <div class="credit-name">PAJI</div>
+      </div>
+      <div class="credit-row">
+        <div>
+          <div class="credit-role">Tester / Owner</div>
+        </div>
+        <div class="credit-name">SINO</div>
+      </div>
+      <div class="credit-row">
+        <div>
+          <div class="credit-role">Coder</div>
+        </div>
+        <div class="credit-name coder">CLAUDE AI</div>
+      </div>
+    </div>
+    <div class="credits-footer">
+      <button id="credits-close-btn">// CLOSE</button>
+    </div>
+    <div class="credits-tag">specimen integrity nominal</div>
+  </div>
+</div>
+
+<!-- credits button -->
+<button id="credits-toggle" title="credits">// credits</button>
+
 <!-- ADMIN CONSOLE -->
-<button id="admin-toggle" title="open admin (`)">// admin</button>
+<button id="admin-toggle" title="open codes (`)">// codes</button>
 <div id="admin">
   <div class="term-title">
-    <span>// ADMIN OVERRIDE</span>
+    <span>// CODES //</span>
     <span id="admin-close" style="cursor:pointer">[x]</span>
   </div>
-  <input id="admin-input" placeholder="enter ADMINONLY to unlock..." autocomplete="off" spellcheck="false" />
+  <input id="admin-input" placeholder="enter code..." autocomplete="off" spellcheck="false" />
   <div class="term-log" id="admin-log"></div>
-  <div class="hint">press ` or ~ to toggle. locked by default. enter <b style="color:var(--acid)">ADMINONLY</b> first.</div>
+  <div class="hint">press ` or ~ to toggle. type HELP to list codes.</div>
 </div>
 
 <script>
@@ -982,7 +1247,6 @@ const DEFAULT_STATE = () => ({
   godMode: false,
   passiveMultCheat: 1,
   stage: 0,
-  adminUnlocked: false,                 // ADMINONLY must be entered to enable cheat codes
 });
 
 let state = DEFAULT_STATE();
@@ -1032,8 +1296,9 @@ function perkCost(p) {
 }
 
 function rpOnRebirth() {
-  // Square-root scaling on grand lifetime keeps gains feeling earned.
-  const base = Math.floor(Math.sqrt(state.grandLifetime / 1e6));
+  // Square-root scaling on THIS-RUN lifetime keeps gains feeling earned.
+  // (Previously used grandLifetime — which never resets — and allowed infinite rebirths.)
+  const base = Math.floor(Math.sqrt(state.lifetime / 1e6));
   return Math.floor(base * perkBundle().fkMult);
 }
 
@@ -1372,7 +1637,7 @@ function refreshHeader() {
   el.lifetime.textContent= 'lifetime: ' + fmt(state.grandLifetime);
 
   const gain = rpOnRebirth();
-  el.prestige.disabled = gain < 1;
+  el.prestige.disabled = false;
   el.prestige.textContent = gain >= 1 ? ('// REBIRTH (+' + fmt(gain) + ' RP) //') : '// REBIRTH //';
 }
 
@@ -1449,7 +1714,9 @@ function spawnFloater(x, y, text, crit) {
   setTimeout(()=>f.remove(), 950);
 }
 
-el.monster.addEventListener('mousedown', onMonsterClick);
+el.monster.addEventListener('pointerdown', onMonsterClick);
+// prevent the touch from also firing a delayed synthetic click
+el.monster.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 
 // ---------- GAME LOOP @ ~60fps ----------
 let lastT = performance.now();
@@ -1533,13 +1800,11 @@ document.getElementById('do-breach').addEventListener('click', () => {
     fk: state.fk,
     perks: state.perks,
     grandLifetime: state.grandLifetime,
-    adminUnlocked: state.adminUnlocked,
   };
   state = DEFAULT_STATE();
   state.fk = keep.fk;
   state.perks = keep.perks;
   state.grandLifetime = keep.grandLifetime;
-  state.adminUnlocked = keep.adminUnlocked;
   const startBM = perkBundle().startBiomass;
   state.biomass = startBM;
   state.lifetime = startBM;
@@ -1572,13 +1837,6 @@ function toggleAdmin() {
 }
 
 const CHEATS = {
-  // ----- MASTER KEY: required before anything else works -----
-  ADMINONLY:   () => {
-    if (state.adminUnlocked) return 'already unlocked. type HELP for codes.';
-    state.adminUnlocked = true;
-    return 'ADMIN ACCESS GRANTED. type HELP to list all codes.';
-  },
-
   // ----- biomass injections -----
   GREEDISGOOD: () => { state.biomass += 1e6; state.lifetime += 1e6; state.grandLifetime += 1e6;
                        return '+1,000,000 biomass injected.'; },
@@ -1609,13 +1867,13 @@ const CHEATS = {
                        return 'godmode = ' + state.godMode + '. all costs ' + (state.godMode?'-> 0.':'restored.'); },
 
   // ----- rebirth helper -----
-  BREACHME:    () => { state.grandLifetime += 1e15; return '+1Qa lifetime added. now rebirth.'; },
+  BREACHME:    () => { state.biomass += 1e15; state.lifetime += 1e15; state.grandLifetime += 1e15;
+                       return '+1Qa biomass + lifetime added. now rebirth.'; },
 
   // ----- terminal utilities -----
   CLEARLOG:    () => { adminLog.innerHTML = ''; return 'log cleared.'; },
-  LOCK:        () => { state.adminUnlocked = false; return 'admin re-locked. enter ADMINONLY to unlock.'; },
 
-  HELP:        () => 'codes: ADMINONLY, GREEDISGOOD, GIGAGAIN, INFINITESOUP, EVOLVENOW, MAXEVERYTHING, INSTAEVOLVE, FASTFORWARD, DOUBLETIME, GODMODE, BREACHME, CLEARLOG, LOCK.',
+  HELP:        () => 'codes: GREEDISGOOD, GIGAGAIN, INFINITESOUP, EVOLVENOW, MAXEVERYTHING, INSTAEVOLVE, FASTFORWARD, DOUBLETIME, GODMODE, BREACHME, CLEARLOG.',
 };
 
 adminInput.addEventListener('keydown', e => {
@@ -1625,20 +1883,13 @@ adminInput.addEventListener('keydown', e => {
   const code = raw.toUpperCase();
   adminInput.value = '';
   let line;
-  // Lock gate: only ADMINONLY (and HELP as a hint) works while locked.
-  if (!state.adminUnlocked && code !== 'ADMINONLY') {
-    if (code === 'HELP') {
-      line = '<div class="err">&gt; LOCKED :: enter ADMINONLY first to unlock cheat codes.</div>';
-    } else {
-      line = '<div class="err">&gt; ' + code + ' :: ACCESS DENIED. enter ADMINONLY first.</div>';
-    }
-  } else if (CHEATS[code]) {
+  if (CHEATS[code]) {
     const msg = CHEATS[code]();
     line = '<div class="ok">&gt; ' + code + ' :: ' + msg + '</div>';
     refreshAll();
     save();
   } else {
-    line = '<div class="err">&gt; ' + code + ' :: unknown override.</div>';
+    line = '<div class="err">&gt; ' + code + ' :: unknown code.</div>';
   }
   adminLog.innerHTML = line + adminLog.innerHTML;
 });
@@ -1657,6 +1908,10 @@ let audioCtx = null;
 function ensureCtx() {
   if (!audioCtx) {
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
+  }
+  // mobile browsers suspend audio context until user gesture - resume on each call
+  if (audioCtx && audioCtx.state === 'suspended') {
+    try { audioCtx.resume(); } catch(e) {}
   }
   return audioCtx;
 }
@@ -1746,6 +2001,23 @@ function maybeShowBriefingOnLoad() {
   try { seen = localStorage.getItem(BRIEFING_SEEN_KEY) === '1'; } catch(e) {}
   if (!seen) showBriefing();
 }
+
+// ---------- CREDITS ----------
+const creditsModal  = document.getElementById('credits-modal');
+const creditsToggle = document.getElementById('credits-toggle');
+const creditsClose  = document.getElementById('credits-close-btn');
+
+function showCredits() { creditsModal.classList.add('show'); }
+function hideCredits() { creditsModal.classList.remove('show'); }
+
+creditsToggle.addEventListener('click', showCredits);
+creditsClose.addEventListener('click', hideCredits);
+creditsModal.addEventListener('click', e => {
+  if (e.target === creditsModal) hideCredits();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && creditsModal.classList.contains('show')) hideCredits();
+});
 
 // ---------- BOOTSTRAP ----------
 function start() {
