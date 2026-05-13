@@ -26,10 +26,22 @@
 
   CHEAT CODES (open with ` or ~ key, or tap the small "admin" in the corner)
   --------------------------------------------------------------------
+    *** ADMINONLY must be entered FIRST to unlock all other codes ***
+
+    ADMINONLY     -> unlocks the admin console
     GREEDISGOOD   -> +1,000,000 biomass
+    GIGAGAIN      -> +100,000,000 biomass
+    INFINITESOUP  -> +1 trillion biomass
     EVOLVENOW     -> max out every active mutation
-    FASTFORWARD   -> permanent 10x to passive income
-    GODMODE       -> all upgrades cost 0
+    MAXEVERYTHING -> max mutations AND passive upgrades
+    INSTAEVOLVE   -> jump lifetime to next evolution stage
+    FASTFORWARD   -> 10x passive income (stacks, this run)
+    DOUBLETIME    -> 2x passive income (stacks, this run)
+    GODMODE       -> all upgrades cost 0 (toggle)
+    BREACHME      -> +1Qa lifetime for fast rebirth
+    CLEARLOG      -> clear the admin terminal log
+    LOCK          -> re-lock the admin console
+    HELP          -> list all codes in-game
   =====================================================================
 -->
 
@@ -530,6 +542,127 @@ footer.bar {
 }
 .click-power-pill b { color: var(--acid); }
 
+/* ====================== GENERAL JONATHAN BRIEFING ====================== */
+/* Military olive palette intentionally clashes with biopunk green — a war room. */
+:root {
+  --olive-dark:  #2a3318;
+  --olive:       #4a5a30;
+  --olive-light: #5a6b3a;
+  --khaki:       #c9b87a;
+  --stencil:     #d8c98a;
+  --gold:        #ffcf3a;
+  --classified:  #c14a4a;
+}
+#briefing-toggle {
+  position: fixed; bottom: 12px; left: 92px;
+  background: transparent; border: 0; color: var(--khaki);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer; padding: 6px 10px;
+  z-index: 500; text-transform: uppercase;
+}
+#briefing-toggle:hover { color: var(--gold); }
+
+#briefing-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+  z-index: 1500;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#briefing-modal.show { display: flex; animation: briefingFade 0.4s; }
+@keyframes briefingFade { from{opacity:0} to{opacity:1} }
+
+.briefing-card {
+  position: relative;
+  width: min(720px, 100%); max-height: 92vh; overflow: auto;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 18px, rgba(0,0,0,0.06) 18px 19px),
+    linear-gradient(180deg, #3d4a26, #2c3618);
+  border: 3px solid var(--khaki);
+  box-shadow:
+    0 0 0 1px var(--olive-dark) inset,
+    0 0 60px rgba(0,0,0,0.8),
+    0 0 80px rgba(255,207,58,0.15);
+  padding: 28px 32px 24px;
+  color: var(--stencil);
+  font-family: 'JetBrains Mono', monospace;
+  animation: briefingSlide 0.5s cubic-bezier(0.3,1.2,0.5,1);
+}
+@keyframes briefingSlide { from{transform:translateY(40px); opacity:0} to{transform:translateY(0); opacity:1} }
+
+.briefing-card::before {
+  content: 'CLASSIFIED // EYES ONLY';
+  position: absolute; top: 8px; left: 0; right: 0;
+  text-align: center; font-size: 9px; color: var(--classified);
+  letter-spacing: 6px; font-weight: 700;
+}
+.briefing-card::after {
+  content: 'OPERATION: GENESIS';
+  position: absolute; bottom: 6px; right: 18px;
+  font-size: 9px; color: var(--khaki); opacity: 0.5; letter-spacing: 4px;
+}
+
+.briefing-header {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px dashed var(--khaki); padding-bottom: 12px; margin: 12px 0 18px;
+}
+.briefing-header h2 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 22px; color: var(--gold); letter-spacing: 4px; margin: 0;
+  text-shadow: 0 0 12px rgba(255,207,58,0.4);
+}
+.briefing-header .stamp {
+  font-size: 10px; color: var(--classified); letter-spacing: 2px;
+  border: 1.5px solid var(--classified); padding: 3px 8px;
+  transform: rotate(-3deg);
+}
+
+.briefing-body {
+  display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: start;
+}
+@media (max-width: 600px) {
+  .briefing-body { grid-template-columns: 1fr; }
+  .briefing-portrait { margin: 0 auto; }
+}
+
+.briefing-portrait {
+  width: 180px; aspect-ratio: 1 / 1.05;
+  background: linear-gradient(180deg, #b8a06a, #8a7340);
+  border: 2px solid var(--khaki);
+  box-shadow: 0 0 0 4px var(--olive-dark), 0 8px 24px rgba(0,0,0,0.5);
+  display: flex; align-items: flex-end; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.briefing-portrait svg { width: 100%; height: 100%; display: block; }
+.briefing-portrait .name-plate {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--olive-dark); color: var(--gold);
+  font-family: 'Major Mono Display', monospace;
+  font-size: 10px; letter-spacing: 2px; text-align: center;
+  padding: 4px 0; border-top: 1px solid var(--khaki);
+}
+
+.briefing-text { font-size: 13px; line-height: 1.65; color: var(--stencil); }
+.briefing-text p { margin: 0 0 10px; }
+.briefing-text .label { color: var(--gold); letter-spacing: 2px; font-size: 11px; font-weight: 700; }
+.briefing-text .redline { color: var(--classified); font-weight: 700; }
+.briefing-text strong { color: #fff; }
+
+.briefing-footer {
+  margin-top: 22px; display: flex; justify-content: flex-end; gap: 10px;
+}
+#yes-sir {
+  background: var(--gold); color: var(--olive-dark);
+  border: 2px solid var(--olive-dark);
+  font-family: 'Major Mono Display', monospace;
+  font-size: 16px; letter-spacing: 6px;
+  padding: 12px 32px; cursor: pointer; font-weight: 700;
+  box-shadow: 0 4px 0 var(--olive-dark), 0 0 24px rgba(255,207,58,0.4);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+#yes-sir:hover { transform: translateY(2px); box-shadow: 0 2px 0 var(--olive-dark), 0 0 24px rgba(255,207,58,0.6); }
+#yes-sir:active { transform: translateY(4px); box-shadow: 0 0 0 var(--olive-dark); }
+
 </style>
 </head>
 
@@ -554,7 +687,7 @@ footer.bar {
         <span class="val" id="ui-pps">0</span>
       </div>
       <div class="stat">
-        <label>Forbidden Knowledge</label>
+        <label>Rebirth Points</label>
         <span class="val fk" id="ui-fk">0</span>
       </div>
     </div>
@@ -593,7 +726,7 @@ footer.bar {
       <button class="io-btn" id="reset-btn">HARD RESET</button>
       <span id="autosave-tick">autosaves every 15s</span>
     </div>
-    <button id="prestige-btn" disabled>// THE BREACH //</button>
+    <button id="prestige-btn" disabled>// REBIRTH //</button>
     <div class="footer-right">
       <span id="lifetime-display">lifetime: 0</span>
     </div>
@@ -601,29 +734,122 @@ footer.bar {
 
 </div>
 
-<!-- PRESTIGE MODAL -->
+<!-- REBIRTH MODAL -->
 <div class="modal-backdrop" id="prestige-modal">
   <div class="modal">
     <button class="modal-close" id="prestige-close">x</button>
-    <h2>THE BREACH</h2>
-    <p class="sub">// rip your specimen apart. carry the memory forward //</p>
+    <h2>REBIRTH</h2>
+    <p class="sub">// dissolve the specimen. spawn it anew with deeper genes //</p>
 
     <div class="fk-pool">
       <div>
-        <div class="label">Forbidden Knowledge held</div>
+        <div class="label">Rebirth Points held</div>
         <div class="value" id="modal-fk-cur">0</div>
       </div>
       <div style="text-align:right">
-        <div class="label">Gain on breach</div>
+        <div class="label">Gain on rebirth</div>
         <div class="value" id="modal-fk-gain" style="color:var(--acid)">0</div>
       </div>
     </div>
 
     <div class="perks-grid" id="perks-grid"></div>
 
-    <button class="do-breach" id="do-breach" disabled>// COMMIT BREACH //</button>
+    <button class="do-breach" id="do-breach" disabled>// COMMIT REBIRTH //</button>
   </div>
 </div>
+
+<!-- GENERAL JONATHAN BRIEFING MODAL -->
+<!--
+  TO SWAP IN YOUR OWN GENERAL JONATHAN IMAGE:
+  Replace the entire <svg>...</svg> inside .briefing-portrait below with:
+      <img src="general-jonathan.png" alt="General Jonathan" style="width:100%;height:100%;object-fit:cover"/>
+  Drop your licensed/original image next to the html file (or use a base64 data URL).
+-->
+<div id="briefing-modal">
+  <div class="briefing-card">
+    <div class="briefing-header">
+      <h2>GEN. JONATHAN // BRIEFING</h2>
+      <span class="stamp">TOP SECRET</span>
+    </div>
+    <div class="briefing-body">
+      <div class="briefing-portrait">
+        <!-- ORIGINAL cartoon general SVG. Swap with an <img> tag if you have licensed art. -->
+        <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" aria-label="General Jonathan saluting">
+          <!-- background tint -->
+          <rect width="200" height="210" fill="none"/>
+          <!-- torso / uniform -->
+          <path d="M40 210 L40 130 Q40 115 55 110 L80 105 L120 105 L145 110 Q160 115 160 130 L160 210 Z"
+                fill="#5a6b3a" stroke="#2a3318" stroke-width="2.5"/>
+          <!-- shirt v-neck -->
+          <path d="M80 105 L100 135 L120 105 Z" fill="#d4c48a" stroke="#2a3318" stroke-width="1.5"/>
+          <!-- tie -->
+          <path d="M95 130 L105 130 L108 175 L100 188 L92 175 Z" fill="#8a6f3a" stroke="#2a3318" stroke-width="1.5"/>
+          <!-- buttons -->
+          <circle cx="100" cy="155" r="2.5" fill="#ffcf3a" stroke="#2a3318" stroke-width="0.8"/>
+          <circle cx="100" cy="172" r="2.5" fill="#ffcf3a" stroke="#2a3318" stroke-width="0.8"/>
+          <circle cx="100" cy="189" r="2.5" fill="#ffcf3a" stroke="#2a3318" stroke-width="0.8"/>
+          <!-- collar stars (rank) -->
+          <text x="62" y="128" font-size="10" fill="#ffcf3a" stroke="#2a3318" stroke-width="0.4">★★★★</text>
+          <text x="118" y="128" font-size="10" fill="#ffcf3a" stroke="#2a3318" stroke-width="0.4">★★★★</text>
+          <!-- medal ribbons -->
+          <rect x="125" y="148" width="22" height="4" fill="#c14a4a" stroke="#2a3318" stroke-width="0.6"/>
+          <rect x="125" y="154" width="22" height="4" fill="#3c6db1" stroke="#2a3318" stroke-width="0.6"/>
+          <rect x="125" y="160" width="22" height="4" fill="#5b9a52" stroke="#2a3318" stroke-width="0.6"/>
+          <!-- left arm (hanging) -->
+          <path d="M150 115 L162 175 L172 200 L156 205 L143 145 Z"
+                fill="#5a6b3a" stroke="#2a3318" stroke-width="2.5"/>
+          <circle cx="164" cy="200" r="9" fill="#e8b88c" stroke="#2a3318" stroke-width="2"/>
+          <!-- right arm raised in salute -->
+          <path d="M50 115 Q35 95 38 70 Q42 55 55 55 Q72 55 75 75 L72 110 Z"
+                fill="#5a6b3a" stroke="#2a3318" stroke-width="2.5"/>
+          <!-- saluting hand at brow -->
+          <ellipse cx="58" cy="62" rx="13" ry="8" fill="#e8b88c" stroke="#2a3318" stroke-width="2" transform="rotate(-18 58 62)"/>
+          <!-- head -->
+          <ellipse cx="100" cy="72" rx="32" ry="34" fill="#e8b88c" stroke="#2a3318" stroke-width="2.5"/>
+          <!-- ear -->
+          <ellipse cx="132" cy="74" rx="4" ry="6" fill="#d9a878" stroke="#2a3318" stroke-width="1.5"/>
+          <!-- helmet -->
+          <path d="M68 68 Q68 32 100 30 Q132 32 132 68 L134 76 Q132 80 100 80 Q68 80 66 76 Z"
+                fill="#4a5a30" stroke="#2a3318" stroke-width="2.5"/>
+          <path d="M66 76 Q100 84 134 76 L134 80 Q100 88 66 80 Z" fill="#3a4624" stroke="#2a3318" stroke-width="1.5"/>
+          <!-- helmet star -->
+          <text x="93" y="62" font-size="22" fill="#ffcf3a" stroke="#2a3318" stroke-width="0.6" font-weight="bold">★</text>
+          <!-- eyebrows -->
+          <path d="M82 84 L94 82" stroke="#888" stroke-width="3" stroke-linecap="round"/>
+          <path d="M106 82 L118 84" stroke="#888" stroke-width="3" stroke-linecap="round"/>
+          <!-- eyes (stern) -->
+          <ellipse cx="88" cy="91" rx="2.5" ry="3.5" fill="#1a1a1a"/>
+          <ellipse cx="112" cy="91" rx="2.5" ry="3.5" fill="#1a1a1a"/>
+          <!-- nose -->
+          <path d="M98 96 Q100 108 105 105" stroke="#b88860" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- big mustache -->
+          <path d="M76 112 Q88 118 100 113 Q112 118 124 112 Q120 124 108 122 Q100 121 92 122 Q80 124 76 112 Z"
+                fill="#d8d8d8" stroke="#666" stroke-width="1.2"/>
+          <!-- firm mouth -->
+          <line x1="93" y1="122" x2="107" y2="122" stroke="#6a4a2a" stroke-width="2" stroke-linecap="round"/>
+          <!-- chin shadow -->
+          <path d="M85 100 Q100 108 115 100" stroke="#c89875" stroke-width="1.5" fill="none" opacity="0.6"/>
+        </svg>
+        <div class="name-plate">GEN. J. KOVACS</div>
+      </div>
+      <div class="briefing-text">
+        <p><span class="label">// OPERATION GENESIS //</span></p>
+        <p>Listen up, soldier.</p>
+        <p>As of <span class="redline">0600 HOURS</span> you are reassigned. Effective immediately, you are <strong>Senior Lead Developer and System Architect</strong> on Project Mutation Lab.</p>
+        <p>Your mission: <strong>engineer bio-weaponized mutations</strong> to grow apex monsters for the armed forces. We need specimens that scale. We need teeth. We need <strong>compliance under fire</strong>.</p>
+        <p>Your lab is hot. Your funding is unlimited. Your specimen is in the tank.</p>
+        <p><span class="redline">Failure is not on the menu, developer.</span></p>
+        <p style="margin-top:14px;color:var(--gold);letter-spacing:2px;">Are you with me?</p>
+      </div>
+    </div>
+    <div class="briefing-footer">
+      <button id="yes-sir">YES SIR</button>
+    </div>
+  </div>
+</div>
+
+<!-- briefing re-trigger button -->
+<button id="briefing-toggle" title="re-read briefing">// briefing</button>
 
 <!-- ADMIN CONSOLE -->
 <button id="admin-toggle" title="open admin (`)">// admin</button>
@@ -632,9 +858,9 @@ footer.bar {
     <span>// ADMIN OVERRIDE</span>
     <span id="admin-close" style="cursor:pointer">[x]</span>
   </div>
-  <input id="admin-input" placeholder="enter override code..." autocomplete="off" spellcheck="false" />
+  <input id="admin-input" placeholder="enter ADMINONLY to unlock..." autocomplete="off" spellcheck="false" />
   <div class="term-log" id="admin-log"></div>
-  <div class="hint">press ` or ~ to toggle. type HELP for codes.</div>
+  <div class="hint">press ` or ~ to toggle. locked by default. enter <b style="color:var(--acid)">ADMINONLY</b> first.</div>
 </div>
 
 <script>
@@ -704,7 +930,7 @@ const UPGRADES = [
     base:1.2e8,    grow:1.20, rate:75000, max:80 },
   { id:'womb',     name:'Cosmic Womb',        icon:'W', desc:'Spawn from a dying star.',
     base:1.8e9,    grow:1.22, rate:520000,max:60 },
-  { id:'breach',   name:'Reality Breach',     icon:'B', desc:'Pull biomass from elsewhere.',
+  { id:'breach',   name:'Reality Rift',       icon:'B', desc:'Pull biomass from elsewhere.',
     base:2.8e10,   grow:1.24, rate:3.6e6, max:50 },
   { id:'void',     name:'Void Genesis',       icon:'V', desc:'It makes itself now.',
     base:4.4e11,   grow:1.26, rate:2.5e7, max:40 },
@@ -720,7 +946,7 @@ const STAGES = [
   { name:'eldritch', threshold: 1e12   },
 ];
 
-// PRESTIGE PERKS: persist after breach. Cost rises with level.
+// PRESTIGE PERKS: persist after rebirth. Cost rises with level.
 const PERKS = [
   { id:'cellmem',   name:'Deep Cell Memory',
     desc:'+8% biomass per click, per level. Compounds at rebirth.',
@@ -739,7 +965,7 @@ const PERKS = [
     base:3, growCost:1.5, max:30,
     apply:(lv) => ({ startBiomass: 250 * lv }) },
   { id:'catalyst',  name:'Catalyst Bloom',
-    desc:'+15% Forbidden Knowledge gain per level.',
+    desc:'+15% Rebirth Points gain per level.',
     base:5, growCost:2.0, max:10,
     apply:(lv) => ({ fkMult: Math.pow(1.15, lv) }) },
 ];
@@ -747,7 +973,7 @@ const PERKS = [
 // ---------- STATE ----------
 const DEFAULT_STATE = () => ({
   biomass: 0,
-  lifetime: 0,                          // total biomass earned this run (resets on breach)
+  lifetime: 0,                          // total biomass earned this run (resets on rebirth)
   grandLifetime: 0,                     // total biomass earned across all runs
   mutations: Object.fromEntries(MUTATIONS.map(m=>[m.id,0])),
   upgrades:  Object.fromEntries(UPGRADES.map(u=>[u.id,0])),
@@ -756,6 +982,7 @@ const DEFAULT_STATE = () => ({
   godMode: false,
   passiveMultCheat: 1,
   stage: 0,
+  adminUnlocked: false,                 // ADMINONLY must be entered to enable cheat codes
 });
 
 let state = DEFAULT_STATE();
@@ -804,7 +1031,7 @@ function perkCost(p) {
   return Math.ceil(p.base * Math.pow(p.growCost, lv));
 }
 
-function fkOnBreach() {
+function rpOnRebirth() {
   // Square-root scaling on grand lifetime keeps gains feeling earned.
   const base = Math.floor(Math.sqrt(state.grandLifetime / 1e6));
   return Math.floor(base * perkBundle().fkMult);
@@ -1144,9 +1371,9 @@ function refreshHeader() {
   el.clickPop.textContent= fmt(computeClickPower());
   el.lifetime.textContent= 'lifetime: ' + fmt(state.grandLifetime);
 
-  const gain = fkOnBreach();
+  const gain = rpOnRebirth();
   el.prestige.disabled = gain < 1;
-  el.prestige.textContent = gain >= 1 ? ('// THE BREACH (+' + fmt(gain) + ' FK) //') : '// THE BREACH //';
+  el.prestige.textContent = gain >= 1 ? ('// REBIRTH (+' + fmt(gain) + ' RP) //') : '// REBIRTH //';
 }
 
 function refreshAll() {
@@ -1256,8 +1483,8 @@ prestigeModal.addEventListener('click', e => { if (e.target === prestigeModal) p
 function openPrestige() {
   renderPerks();
   el.modalFK.textContent  = fmt(state.fk);
-  el.modalGain.textContent= fmt(fkOnBreach());
-  el.doBreach.disabled = fkOnBreach() < 1;
+  el.modalGain.textContent= fmt(rpOnRebirth());
+  el.doBreach.disabled = rpOnRebirth() < 1;
   prestigeModal.classList.add('show');
 }
 
@@ -1272,7 +1499,7 @@ function renderPerks() {
       '<div class="perk-meta">' +
         '<span class="lvl">lv ' + lv + ' / ' + p.max + '</span>' +
         '<span class="cost ' + (maxed?'':(state.fk>=c?'ok':'bad')) + '">' +
-          (maxed?'APEX':(fmt(c) + ' FK')) +
+          (maxed?'APEX':(fmt(c) + ' RP')) +
         '</span>' +
       '</div>' +
     '</div>';
@@ -1299,19 +1526,25 @@ function buyPerk(id) {
 }
 
 document.getElementById('do-breach').addEventListener('click', () => {
-  const gain = fkOnBreach();
+  const gain = rpOnRebirth();
   if (gain < 1) return;
   state.fk += gain;
-  const keep = { fk: state.fk, perks: state.perks, grandLifetime: state.grandLifetime };
+  const keep = {
+    fk: state.fk,
+    perks: state.perks,
+    grandLifetime: state.grandLifetime,
+    adminUnlocked: state.adminUnlocked,
+  };
   state = DEFAULT_STATE();
   state.fk = keep.fk;
   state.perks = keep.perks;
   state.grandLifetime = keep.grandLifetime;
+  state.adminUnlocked = keep.adminUnlocked;
   const startBM = perkBundle().startBiomass;
   state.biomass = startBM;
   state.lifetime = startBM;
   prestigeModal.classList.remove('show');
-  toast('BREACH COMPLETE +' + fmt(gain) + ' FK');
+  toast('REBIRTH COMPLETE +' + fmt(gain) + ' RP');
   refreshAll();
   save();
 });
@@ -1339,16 +1572,50 @@ function toggleAdmin() {
 }
 
 const CHEATS = {
+  // ----- MASTER KEY: required before anything else works -----
+  ADMINONLY:   () => {
+    if (state.adminUnlocked) return 'already unlocked. type HELP for codes.';
+    state.adminUnlocked = true;
+    return 'ADMIN ACCESS GRANTED. type HELP to list all codes.';
+  },
+
+  // ----- biomass injections -----
   GREEDISGOOD: () => { state.biomass += 1e6; state.lifetime += 1e6; state.grandLifetime += 1e6;
                        return '+1,000,000 biomass injected.'; },
+  GIGAGAIN:    () => { state.biomass += 1e8; state.lifetime += 1e8; state.grandLifetime += 1e8;
+                       return '+100,000,000 biomass injected.'; },
+  INFINITESOUP:() => { state.biomass += 1e12; state.lifetime += 1e12; state.grandLifetime += 1e12;
+                       return '+1T biomass dumped into the tank.'; },
+
+  // ----- progression skips -----
   EVOLVENOW:   () => { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
                        return 'all active mutations forced to apex.'; },
+  MAXEVERYTHING:()=> { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
+                       for (const u of UPGRADES)  state.upgrades[u.id]  = u.max;
+                       return 'mutations AND upgrades maxed.'; },
+  INSTAEVOLVE: () => {
+                       const next = STAGES[Math.min(state.stage + 1, STAGES.length - 1)];
+                       const need = Math.max(next.threshold, state.lifetime + 1);
+                       const add  = need - state.lifetime;
+                       state.biomass += add; state.lifetime += add; state.grandLifetime += add;
+                       return 'lifetime advanced to next stage threshold.'; },
+
+  // ----- multipliers / utility -----
   FASTFORWARD: () => { state.passiveMultCheat *= 10;
-                       return 'passive multiplier x' + state.passiveMultCheat + ' (permanent this run).'; },
+                       return 'passive multiplier x' + state.passiveMultCheat + ' (this run).'; },
+  DOUBLETIME:  () => { state.passiveMultCheat *= 2;
+                       return 'passive multiplier x' + state.passiveMultCheat + ' (this run).'; },
   GODMODE:     () => { state.godMode = !state.godMode;
                        return 'godmode = ' + state.godMode + '. all costs ' + (state.godMode?'-> 0.':'restored.'); },
-  HELP:        () => 'codes: GREEDISGOOD, EVOLVENOW, FASTFORWARD, GODMODE, BREACHME.',
-  BREACHME:    () => { state.grandLifetime += 1e15; return '+ huge lifetime added. now breach.'; },
+
+  // ----- rebirth helper -----
+  BREACHME:    () => { state.grandLifetime += 1e15; return '+1Qa lifetime added. now rebirth.'; },
+
+  // ----- terminal utilities -----
+  CLEARLOG:    () => { adminLog.innerHTML = ''; return 'log cleared.'; },
+  LOCK:        () => { state.adminUnlocked = false; return 'admin re-locked. enter ADMINONLY to unlock.'; },
+
+  HELP:        () => 'codes: ADMINONLY, GREEDISGOOD, GIGAGAIN, INFINITESOUP, EVOLVENOW, MAXEVERYTHING, INSTAEVOLVE, FASTFORWARD, DOUBLETIME, GODMODE, BREACHME, CLEARLOG, LOCK.',
 };
 
 adminInput.addEventListener('keydown', e => {
@@ -1358,10 +1625,18 @@ adminInput.addEventListener('keydown', e => {
   const code = raw.toUpperCase();
   adminInput.value = '';
   let line;
-  if (CHEATS[code]) {
+  // Lock gate: only ADMINONLY (and HELP as a hint) works while locked.
+  if (!state.adminUnlocked && code !== 'ADMINONLY') {
+    if (code === 'HELP') {
+      line = '<div class="err">&gt; LOCKED :: enter ADMINONLY first to unlock cheat codes.</div>';
+    } else {
+      line = '<div class="err">&gt; ' + code + ' :: ACCESS DENIED. enter ADMINONLY first.</div>';
+    }
+  } else if (CHEATS[code]) {
     const msg = CHEATS[code]();
     line = '<div class="ok">&gt; ' + code + ' :: ' + msg + '</div>';
     refreshAll();
+    save();
   } else {
     line = '<div class="err">&gt; ' + code + ' :: unknown override.</div>';
   }
@@ -1428,8 +1703,9 @@ function load() {
 
 document.getElementById('save-btn').addEventListener('click', () => { save(); toast('SAVED'); });
 document.getElementById('reset-btn').addEventListener('click', () => {
-  if (!confirm('Wipe ALL progress including Forbidden Knowledge and perks? This is permanent.')) return;
+  if (!confirm('Wipe ALL progress including Rebirth Points and perks? This is permanent.')) return;
   try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+  try { localStorage.removeItem('mutationLabGenesis.briefingSeen'); } catch(e) {}
   state = DEFAULT_STATE();
   refreshAll();
   toast('HARD RESET');
@@ -1438,11 +1714,45 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 setInterval(save, 15000);
 window.addEventListener('beforeunload', save);
 
+// ---------- GENERAL JONATHAN BRIEFING ----------
+const briefingModal  = document.getElementById('briefing-modal');
+const briefingToggle = document.getElementById('briefing-toggle');
+const yesSirBtn      = document.getElementById('yes-sir');
+const BRIEFING_SEEN_KEY = 'mutationLabGenesis.briefingSeen';
+
+function showBriefing() {
+  briefingModal.classList.add('show');
+}
+function hideBriefing() {
+  briefingModal.classList.remove('show');
+  try { localStorage.setItem(BRIEFING_SEEN_KEY, '1'); } catch(e) {}
+}
+
+yesSirBtn.addEventListener('click', () => {
+  hideBriefing();
+  toast('REPORTING FOR DUTY');
+  try { playSound('perk'); } catch(e) {}
+});
+briefingToggle.addEventListener('click', showBriefing);
+briefingModal.addEventListener('click', e => {
+  if (e.target === briefingModal) hideBriefing();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && briefingModal.classList.contains('show')) hideBriefing();
+});
+
+function maybeShowBriefingOnLoad() {
+  let seen = false;
+  try { seen = localStorage.getItem(BRIEFING_SEEN_KEY) === '1'; } catch(e) {}
+  if (!seen) showBriefing();
+}
+
 // ---------- BOOTSTRAP ----------
 function start() {
   load();
   buildLists();
   refreshAll();
+  maybeShowBriefingOnLoad();
 }
 start();
 
