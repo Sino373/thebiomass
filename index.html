@@ -29,6 +29,12 @@
     const sfx = { click: new Audio('click.wav'), evolve: new Audio('evolve.wav') };
     function playSound(name) { sfx[name]?.play(); }
 
+  EVOLUTION BONUSES (NEW)
+  ------------------------
+  Each stage now grants concrete gameplay perks - see the STAGES array.
+  Bonuses are read live via stageBundle() and applied to click power,
+  passive income, crit chance/multiplier, and upgrade costs.
+
   CHEAT CODES (open with ` or ~ key, or tap the small "admin" in the corner)
   --------------------------------------------------------------------
     *** ADMINONLY must be entered FIRST to unlock all other codes ***
@@ -288,12 +294,37 @@ header.bar::after {
   position: absolute; top: 16px; left: 0; right: 0;
   text-align: center; pointer-events: none;
   font-size: 10px; letter-spacing: 4px; color: var(--muted);
+  padding: 0 10px;
 }
 .stage-info .name {
   display: block; font-family: 'Major Mono Display', monospace;
   font-size: 18px; color: var(--acid); margin-top: 4px;
   text-shadow: 0 0 12px rgba(180,255,57,0.4);
 }
+/* NEW: stage perk pills */
+.stage-info .bonuses {
+  display: inline-flex; flex-wrap: wrap; justify-content: center;
+  gap: 4px 6px; margin-top: 8px;
+  letter-spacing: 1.5px; font-size: 9px;
+}
+.stage-info .bonuses .pill {
+  background: rgba(15,22,25,0.6);
+  border: 1px solid var(--line);
+  padding: 3px 7px;
+  color: var(--muted);
+}
+.stage-info .bonuses .pill b { color: var(--acid); font-weight: 700; }
+.stage-info .bonuses .pill.crit b { color: var(--blood); }
+.stage-info .bonuses .pill.cost b { color: var(--rot); }
+.stage-info .next-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--rot);
+  opacity: 0.85;
+}
+.stage-info .next-hint .tag { color: var(--muted); margin-right: 6px; }
 
 #monster-wrap {
   width: min(440px, 80vw);
@@ -548,7 +579,10 @@ footer.bar {
   z-index: 2000; box-shadow: 0 0 20px rgba(180,255,57,0.3);
   animation: toastIn 0.3s, toastOut 0.4s 2.6s forwards;
   text-transform: uppercase;
+  text-align: center;
+  max-width: 90vw;
 }
+.toast b { color: var(--bone); }
 @keyframes toastIn  { from{opacity:0; transform:translate(-50%, -20px)} to{opacity:1; transform:translate(-50%, 0)} }
 @keyframes toastOut { to{opacity:0; transform:translate(-50%, -20px)} }
 
@@ -788,9 +822,11 @@ footer.bar {
     width: min(380px, 86vw);
     height: min(380px, 46vh);
   }
-  .stage { min-height: 50vh; padding: 50px 0 30px; }
+  .stage { min-height: 50vh; padding: 90px 0 30px; }
   .stage-info { top: 10px; font-size: 9px; }
   .stage-info .name { font-size: 15px; }
+  .stage-info .bonuses { font-size: 8px; }
+  .stage-info .next-hint { font-size: 8px; }
   .click-power-pill { top: 8px; right: 8px; padding: 4px 8px; font-size: 9px; }
   .stage-progress { padding: 10px 14px; left: 10px; right: 10px; bottom: 10px; }
 
@@ -871,7 +907,7 @@ footer.bar {
   .stat .val { font-size: 12px; }
   .stat .val.big { font-size: 13px; }
   #monster-wrap { width: 86vw; height: 280px; }
-  .stage { min-height: 44vh; padding: 48px 0 24px; }
+  .stage { min-height: 44vh; padding: 80px 0 24px; }
 
   #admin-toggle, #briefing-toggle, #credits-toggle {
     font-size: 10px; padding: 7px 8px; letter-spacing: 1px;
@@ -932,6 +968,8 @@ footer.bar {
     <div class="stage-info">
       <span id="stage-label">STAGE 1 / 6</span>
       <span class="name" id="stage-name">cell</span>
+      <span class="bonuses" id="stage-bonuses"></span>
+      <span class="next-hint" id="stage-next-hint"></span>
     </div>
 
     <div id="monster-wrap">
@@ -1152,6 +1190,12 @@ function fmt(n) {
   return mant.toFixed(2) + 'e' + exp;
 }
 
+// Format a multiplier as e.g. "x1.5" / "x2"
+function fmtMult(n) {
+  if (Number.isInteger(n)) return 'x' + n;
+  return 'x' + n.toFixed(2).replace(/\.?0+$/, '');
+}
+
 // ---------- CONTENT DATABASE ----------
 // MUTATIONS: active upgrades that boost per-click damage.
 const MUTATIONS = [
@@ -1202,13 +1246,31 @@ const UPGRADES = [
 ];
 
 // EVOLUTION STAGES: thresholds determine the visual form.
+// NEW: each stage now grants concrete gameplay bonuses.
+//   clickMult   - multiplies all click damage
+//   passiveMult - multiplies all /sec production
+//   critChance  - chance of a critical click (was 0.05 hardcoded)
+//   critMult    - total damage multiplier on a crit (was 5 hardcoded)
+//   costMult    - flat cost reduction on every upgrade (1.0 = no change)
 const STAGES = [
-  { name:'cell',     threshold: 0      },
-  { name:'larva',    threshold: 1e3    },
-  { name:'crawler',  threshold: 1e5    },
-  { name:'beast',    threshold: 1e7    },
-  { name:'titan',    threshold: 1e9    },
-  { name:'eldritch', threshold: 1e12   },
+  { name:'cell',     threshold: 0,
+    clickMult: 1.0,  passiveMult: 1.0,  critChance: 0.05, critMult: 5,  costMult: 1.00,
+    blurb: 'baseline. nothing extra. yet.' },
+  { name:'larva',    threshold: 1e3,
+    clickMult: 1.5,  passiveMult: 1.2,  critChance: 0.06, critMult: 5,  costMult: 1.00,
+    blurb: 'wriggling. hungry. faster than a cell.' },
+  { name:'crawler',  threshold: 1e5,
+    clickMult: 2.0,  passiveMult: 1.5,  critChance: 0.08, critMult: 6,  costMult: 0.98,
+    blurb: 'limbs. eyes. opinions about prey.' },
+  { name:'beast',    threshold: 1e7,
+    clickMult: 3.0,  passiveMult: 2.0,  critChance: 0.10, critMult: 7,  costMult: 0.95,
+    blurb: 'apex of the lab. doors no longer help.' },
+  { name:'titan',    threshold: 1e9,
+    clickMult: 5.0,  passiveMult: 3.0,  critChance: 0.12, critMult: 8,  costMult: 0.92,
+    blurb: 'load-bearing flesh. visible from orbit.' },
+  { name:'eldritch', threshold: 1e12,
+    clickMult: 8.0,  passiveMult: 5.0,  critChance: 0.15, critMult: 10, costMult: 0.88,
+    blurb: 'understanding it costs sanity.' },
 ];
 
 // PRESTIGE PERKS: persist after rebirth. Cost rises with level.
@@ -1266,28 +1328,36 @@ function perkBundle() {
   return bundle;
 }
 
+// NEW: stage-derived bundle (just the current stage's flat numbers)
+function stageBundle() {
+  return STAGES[currentStage()];
+}
+
 function computeClickPower() {
   const bundle = perkBundle();
+  const s = stageBundle();
   let pwr = 1; // baseline
   for (const m of MUTATIONS) {
     pwr += (state.mutations[m.id] || 0) * m.power;
   }
-  return pwr * bundle.clickMult;
+  return pwr * bundle.clickMult * s.clickMult;
 }
 
 function computePassive() {
   const bundle = perkBundle();
+  const s = stageBundle();
   let pps = 0;
   for (const u of UPGRADES) {
     pps += (state.upgrades[u.id] || 0) * u.rate;
   }
-  return pps * bundle.passiveMult * state.passiveMultCheat;
+  return pps * bundle.passiveMult * state.passiveMultCheat * s.passiveMult;
 }
 
 function costOf(def, owned) {
   if (state.godMode) return 0;
   const bundle = perkBundle();
-  return Math.ceil(def.base * Math.pow(def.grow, owned) * bundle.costMult);
+  const s = stageBundle();
+  return Math.ceil(def.base * Math.pow(def.grow, owned) * bundle.costMult * s.costMult);
 }
 
 function perkCost(p) {
@@ -1309,6 +1379,34 @@ function currentStage() {
     if (state.lifetime >= STAGES[i].threshold) idx = i;
   }
   return idx;
+}
+
+// Build a compact diff string between the previous stage and this one,
+// so the evolution toast can announce the *new* bonuses gained.
+function stageBonusDiff(prevIdx, nextIdx) {
+  if (prevIdx < 0) prevIdx = 0;
+  const p = STAGES[prevIdx], n = STAGES[nextIdx];
+  const parts = [];
+  if (n.clickMult > p.clickMult) {
+    const pct = Math.round((n.clickMult / p.clickMult - 1) * 100);
+    parts.push('+' + pct + '% CLICK');
+  }
+  if (n.passiveMult > p.passiveMult) {
+    const pct = Math.round((n.passiveMult / p.passiveMult - 1) * 100);
+    parts.push('+' + pct + '% PASSIVE');
+  }
+  if (n.critChance > p.critChance) {
+    const pct = Math.round((n.critChance - p.critChance) * 100);
+    parts.push('+' + pct + '% CRIT');
+  }
+  if (n.critMult > p.critMult) {
+    parts.push('CRIT x' + n.critMult);
+  }
+  if (n.costMult < p.costMult) {
+    const pct = Math.round((1 - n.costMult / p.costMult) * 100);
+    parts.push('-' + pct + '% COSTS');
+  }
+  return parts.join(' | ');
 }
 
 // SVG art for each evolution stage. Replace any block with <img src="...">.
@@ -1488,6 +1586,8 @@ const el = {
   monster:   document.getElementById('monster-art'),
   stageLabel:document.getElementById('stage-label'),
   stageName: document.getElementById('stage-name'),
+  stageBonuses: document.getElementById('stage-bonuses'),
+  stageNextHint: document.getElementById('stage-next-hint'),
   stageCur:  document.getElementById('stage-progress-cur'),
   stageNeed: document.getElementById('stage-progress-need'),
   stageFill: document.getElementById('stage-bar-fill'),
@@ -1504,16 +1604,41 @@ const el = {
 
 let lastStageRendered = -1;
 
+// Build the inline pill row showing the *current* stage's active bonuses.
+function renderStageBonuses(idx) {
+  const s = STAGES[idx];
+  const pills = [];
+  pills.push('<span class="pill">CLK <b>' + fmtMult(s.clickMult) + '</b></span>');
+  pills.push('<span class="pill">PSV <b>' + fmtMult(s.passiveMult) + '</b></span>');
+  pills.push('<span class="pill crit">CRIT <b>' + Math.round(s.critChance * 100) + '%</b></span>');
+  pills.push('<span class="pill crit">CDMG <b>x' + s.critMult + '</b></span>');
+  if (s.costMult < 1) {
+    pills.push('<span class="pill cost">COST <b>-' + Math.round((1 - s.costMult) * 100) + '%</b></span>');
+  }
+  el.stageBonuses.innerHTML = pills.join('');
+
+  // Next-stage preview
+  if (idx < STAGES.length - 1) {
+    const diff = stageBonusDiff(idx, idx + 1);
+    el.stageNextHint.innerHTML = '<span class="tag">NEXT // ' + STAGES[idx+1].name.toUpperCase() + ':</span>' + diff;
+  } else {
+    el.stageNextHint.innerHTML = '<span class="tag">// APEX FORM ACHIEVED</span>';
+  }
+}
+
 function renderMonster(force=false) {
   const idx = currentStage();
   if (idx !== lastStageRendered || force) {
     el.monster.innerHTML = svgFor(idx);
     if (lastStageRendered !== -1 && idx > lastStageRendered) {
       triggerEvolutionFlash();
-      toast('EVOLVED -> ' + STAGES[idx].name.toUpperCase());
+      // Big celebratory toast that calls out the new bonuses earned.
+      const diff = stageBonusDiff(lastStageRendered, idx);
+      toast('EVOLVED -> ' + STAGES[idx].name.toUpperCase() + (diff ? ' // ' + diff : ''));
     }
     lastStageRendered = idx;
     state.stage = idx;
+    renderStageBonuses(idx);
   }
   el.stageLabel.textContent = 'STAGE ' + (idx+1) + ' / ' + STAGES.length;
   el.stageName.textContent  = STAGES[idx].name;
@@ -1675,6 +1800,7 @@ function buyUpgrade(id) {
 // CLICK!
 function onMonsterClick(e) {
   const power = computeClickPower();
+  const s = stageBundle();
   state.biomass += power;
   state.lifetime += power;
   state.grandLifetime += power;
@@ -1693,13 +1819,16 @@ function onMonsterClick(e) {
   document.getElementById('monster-wrap').appendChild(r);
   setTimeout(()=>r.remove(), 650);
 
-  // floating text at mouse coords
-  const isCrit = Math.random() < 0.05;
-  spawnFloater(e.clientX, e.clientY, '+' + fmt(isCrit ? power * 5 : power), isCrit);
+  // CRIT: use stage-driven crit chance + multiplier.
+  // power is already counted toward biomass; crit adds the rest.
+  const isCrit = Math.random() < s.critChance;
   if (isCrit) {
-    const bonus = power * 4; // already counted base power above
-    state.biomass += bonus; state.lifetime += bonus; state.grandLifetime += bonus;
+    const bonus = power * (s.critMult - 1);
+    state.biomass += bonus;
+    state.lifetime += bonus;
+    state.grandLifetime += bonus;
   }
+  spawnFloater(e.clientX, e.clientY, '+' + fmt(isCrit ? power * s.critMult : power), isCrit);
   playSound('click');
 }
 
@@ -1808,6 +1937,7 @@ document.getElementById('do-breach').addEventListener('click', () => {
   const startBM = perkBundle().startBiomass;
   state.biomass = startBM;
   state.lifetime = startBM;
+  lastStageRendered = -1; // force re-render of stage 0
   prestigeModal.classList.remove('show');
   toast('REBIRTH COMPLETE +' + fmt(gain) + ' RP');
   refreshAll();
@@ -1873,7 +2003,7 @@ const CHEATS = {
   // ----- terminal utilities -----
   CLEARLOG:    () => { adminLog.innerHTML = ''; return 'log cleared.'; },
 
-  HELP:        () => 'codes: GREEDISGOOD, GIGAGAIN, INFINITESOUP, EVOLVENOW, MAXEVERYTHING, INSTAEVOLVE, FASTFORWARD, DOUBLETIME, GODMODE, BREACHME, CLEARLOG.',
+  HELP:        () => 'codes: ha you actually thought you would get help? Your on your own',
 };
 
 adminInput.addEventListener('keydown', e => {
@@ -1898,7 +2028,7 @@ adminInput.addEventListener('keydown', e => {
 function toast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
-  t.textContent = msg;
+  t.innerHTML = msg;
   document.body.appendChild(t);
   setTimeout(()=>t.remove(), 3000);
 }
@@ -1962,6 +2092,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
   try { localStorage.removeItem('mutationLabGenesis.briefingSeen'); } catch(e) {}
   state = DEFAULT_STATE();
+  lastStageRendered = -1;
   refreshAll();
   toast('HARD RESET');
 });
