@@ -429,6 +429,159 @@ header.bar::after {
   transition: width 0.4s ease;
 }
 
+/* ====================== GOLDEN SPORE (rare clickable bonus) ====================== */
+.spore {
+  position: absolute;
+  width: 48px; height: 48px;
+  cursor: pointer;
+  z-index: 20;
+  animation: sporeFloat 3s ease-in-out infinite, sporeIn 0.4s ease-out;
+  filter: drop-shadow(0 0 12px #ffcf3a) drop-shadow(0 0 24px #ffcf3a);
+  pointer-events: auto;
+}
+@keyframes sporeFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%     { transform: translateY(-8px) rotate(8deg); }
+}
+@keyframes sporeIn {
+  from { transform: scale(0) rotate(-180deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.spore svg { width:100%; height:100%; }
+
+/* ====================== EVENT BANNER ====================== */
+.event-banner {
+  position: absolute;
+  top: 50%; left: 16px;
+  transform: translateY(-50%);
+  background: rgba(15,22,25,0.85);
+  border-left: 3px solid var(--rot);
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  z-index: 7;
+  max-width: 170px;
+  animation: eventIn 0.4s ease-out;
+}
+.event-banner.good { border-left-color: var(--acid); }
+.event-banner.bad  { border-left-color: var(--blood); }
+.event-banner .ev-name { color: var(--bone); font-weight: 700; display:block; margin-bottom: 2px;}
+.event-banner.good .ev-name { color: var(--acid); }
+.event-banner.bad  .ev-name { color: var(--blood); }
+.event-banner .ev-desc { color: var(--muted); font-size: 9px; }
+.event-banner .ev-time { color: var(--muted); font-size: 9px; margin-top: 4px; display:block; }
+@keyframes eventIn {
+  from { transform: translateY(-50%) translateX(-20px); opacity: 0; }
+  to   { transform: translateY(-50%) translateX(0); opacity: 1; }
+}
+@media (max-width: 760px) {
+  .event-banner { left: 8px; max-width: 130px; padding: 6px 8px; }
+}
+
+/* ====================== ACHIEVEMENTS ====================== */
+#achv-toggle {
+  position: fixed; bottom: 12px; left: 282px;
+  background: transparent; border: 0; color: var(--warn);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer; padding: 6px 10px;
+  z-index: 500; text-transform: uppercase;
+}
+#achv-toggle:hover { color: var(--gold); }
+#achv-toggle .pending {
+  display: inline-block; background: var(--gold); color: var(--olive-dark);
+  margin-left: 4px; padding: 1px 5px; border-radius: 8px;
+  font-weight: 700; font-size: 9px;
+}
+
+#achv-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(4px);
+  z-index: 1500;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#achv-modal.show { display: flex; animation: briefingFade 0.3s; }
+.achv-card {
+  width: min(520px, 100%);
+  max-height: 86vh; overflow-y: auto;
+  background: var(--bg-1);
+  border: 1px solid var(--warn);
+  box-shadow: 0 0 40px rgba(255,194,102,0.25);
+  padding: 24px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.achv-card h3 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 18px; letter-spacing: 5px; color: var(--warn);
+  text-align: center; margin-bottom: 4px;
+}
+.achv-card .sub {
+  font-size: 10px; color: var(--muted); letter-spacing: 2px;
+  text-align: center; margin-bottom: 16px;
+}
+.achv-row {
+  display: grid; grid-template-columns: 36px 1fr auto;
+  align-items: center; gap: 10px;
+  background: var(--bg-2); border-left: 2px solid var(--line);
+  padding: 8px 10px; margin-bottom: 6px;
+}
+.achv-row.unlocked { border-left-color: var(--warn); }
+.achv-row.unlocked .achv-icon { color: var(--warn); }
+.achv-icon { font-family:'Major Mono Display'; font-size: 22px; color: var(--muted); text-align: center; }
+.achv-name { font-size: 12px; font-weight: 700; color: var(--bone); }
+.achv-row.locked .achv-name { color: var(--muted); }
+.achv-desc { font-size: 9px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; }
+.achv-bonus { font-size: 10px; color: var(--acid); letter-spacing: 1.5px; }
+.achv-row.locked .achv-bonus { color: var(--muted); opacity: 0.5; }
+
+/* ====================== WELCOME BACK (offline) ====================== */
+#welcome-back {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+  z-index: 1600;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#welcome-back.show { display: flex; animation: briefingFade 0.3s; }
+.welcome-card {
+  width: min(420px, 100%);
+  background: var(--bg-1);
+  border: 1px solid var(--acid);
+  padding: 24px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 0 0 40px rgba(180,255,57,0.25);
+}
+.welcome-card h3 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 18px; letter-spacing: 5px; color: var(--acid);
+  margin-bottom: 6px;
+}
+.welcome-card .sub { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 14px;}
+.welcome-card .away { font-size: 12px; color: var(--bone); margin: 12px 0 4px; }
+.welcome-card .earned { font-size: 26px; color: var(--acid); font-weight: 700; margin: 6px 0 14px; }
+.welcome-card .note { font-size: 9px; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 14px; }
+#welcome-claim {
+  background: var(--acid); color: var(--olive-dark);
+  border: none; padding: 10px 24px;
+  font-family: 'Major Mono Display', monospace;
+  font-size: 13px; letter-spacing: 4px; cursor: pointer; font-weight: 700;
+}
+#welcome-claim:hover { box-shadow: 0 0 18px var(--acid); }
+
+@media (max-width: 760px) {
+  #achv-toggle {
+    bottom: 8px; font-size: 11px;
+    padding: 8px 10px; min-height: 36px;
+    background: rgba(15,22,25,0.65);
+    border: 1px solid var(--line);
+    left: 296px;
+  }
+}
+@media (max-width: 420px) {
+  #achv-toggle { left: 264px; font-size: 10px; padding: 7px 8px; letter-spacing: 1px; }
+}
+
 /* ====================== FOOTER ====================== */
 footer.bar {
   grid-area: footer;
@@ -981,6 +1134,8 @@ footer.bar {
       <div id="monster-art"></div>
     </div>
 
+    <div id="event-banner-host"></div>
+
     <div class="stage-progress">
       <div class="lbl"><span id="stage-progress-cur">0</span><span id="stage-progress-need">-> 1.00K</span></div>
       <div class="stage-bar"><div class="stage-bar-fill" id="stage-bar-fill" style="width:0%"></div></div>
@@ -1158,6 +1313,28 @@ footer.bar {
 <!-- credits button -->
 <button id="credits-toggle" title="credits">// credits</button>
 
+<!-- ACHIEVEMENTS BUTTON + MODAL -->
+<button id="achv-toggle" title="achievements">// trophies<span id="achv-pending" class="pending" style="display:none">0</span></button>
+<div id="achv-modal">
+  <div class="achv-card">
+    <h3>TROPHY ROOM</h3>
+    <div class="sub">// permanent specimen merit //</div>
+    <div id="achv-list"></div>
+  </div>
+</div>
+
+<!-- WELCOME BACK (offline progress) -->
+<div id="welcome-back">
+  <div class="welcome-card">
+    <h3>WELCOME BACK</h3>
+    <div class="sub">// the specimen kept eating //</div>
+    <div class="away">You were away for <b id="welcome-time">--</b></div>
+    <div class="earned" id="welcome-earned">+0</div>
+    <div class="note">offline gain caps at 2 hours of passive income</div>
+    <button id="welcome-claim">// CLAIM</button>
+  </div>
+</div>
+
 <!-- ADMIN CONSOLE -->
 <button id="admin-toggle" title="open codes (`)">// codes</button>
 <div id="admin">
@@ -1301,6 +1478,51 @@ const PERKS = [
     apply:(lv) => ({ fkMult: Math.pow(1.15, lv) }) },
 ];
 
+// ACHIEVEMENTS: permanent milestones with small but stacking bonuses.
+// `check(state)` returns true if unlocked. `bonus` is applied via achvBundle().
+const ACHIEVEMENTS = [
+  { id:'click100',  icon:'#', name:'First Pinch',     desc:'Reach 100 biomass.',
+    check: s => s.grandLifetime >= 100,             bonus:{clickMult:1.02} },
+  { id:'click10k',  icon:'#', name:'Snack Time',      desc:'Reach 10K biomass.',
+    check: s => s.grandLifetime >= 1e4,             bonus:{clickMult:1.03} },
+  { id:'click1m',   icon:'#', name:'Million Bites',   desc:'Reach 1M biomass.',
+    check: s => s.grandLifetime >= 1e6,             bonus:{clickMult:1.05} },
+  { id:'click1b',   icon:'#', name:'Bloodgorge',      desc:'Reach 1B biomass.',
+    check: s => s.grandLifetime >= 1e9,             bonus:{clickMult:1.10} },
+  { id:'click1t',   icon:'#', name:'Tonnage',         desc:'Reach 1T biomass.',
+    check: s => s.grandLifetime >= 1e12,            bonus:{clickMult:1.15} },
+
+  { id:'evolve3',   icon:'V', name:'Adolescence',     desc:'Reach the Crawler stage.',
+    check: s => s.stage >= 2,                       bonus:{passiveMult:1.05} },
+  { id:'evolve5',   icon:'V', name:'Tectonic',        desc:'Reach the Titan stage.',
+    check: s => s.stage >= 4,                       bonus:{passiveMult:1.10} },
+  { id:'evolve6',   icon:'V', name:'Sanity Toll',     desc:'Reach the Eldritch stage.',
+    check: s => s.stage >= 5,                       bonus:{clickMult:1.15, passiveMult:1.15} },
+
+  { id:'rebirth1',  icon:'O', name:'First Death',     desc:'Rebirth once.',
+    check: s => s.totalRebirths >= 1,               bonus:{clickMult:1.05, passiveMult:1.05} },
+  { id:'rebirth5',  icon:'O', name:'Serial Hatcher',  desc:'Rebirth 5 times.',
+    check: s => s.totalRebirths >= 5,               bonus:{passiveMult:1.15} },
+  { id:'rebirth25', icon:'O', name:'Eternal Recurrence', desc:'Rebirth 25 times.',
+    check: s => s.totalRebirths >= 25,              bonus:{clickMult:1.25, passiveMult:1.25} },
+
+  { id:'mut50',     icon:'*', name:'Tooth Connoisseur', desc:'Buy 50 mutations total.',
+    check: s => totalMutBought(s) >= 50,            bonus:{clickMult:1.10} },
+  { id:'up50',      icon:'^', name:'Lab Director',    desc:'Buy 50 passive upgrades total.',
+    check: s => totalUpBought(s) >= 50,             bonus:{passiveMult:1.10} },
+
+  { id:'apex1',     icon:'X', name:'Beyond Apex',     desc:'Reach Apex Tier 1.',
+    check: s => apexTier() >= 1,                    bonus:{clickMult:1.10} },
+  { id:'apex5',     icon:'X', name:'Tier Climber',    desc:'Reach Apex Tier 5.',
+    check: s => apexTier() >= 5,                    bonus:{clickMult:1.20, passiveMult:1.20} },
+
+  { id:'spore1',    icon:'@', name:'Lucky Catch',     desc:'Grab a Golden Spore.',
+    check: s => s.sporesGrabbed >= 1,               bonus:{clickMult:1.05} },
+];
+
+function totalMutBought(s) { let n=0; for (const k in s.mutations) n+=s.mutations[k]; return n; }
+function totalUpBought(s)  { let n=0; for (const k in s.upgrades)  n+=s.upgrades[k];  return n; }
+
 // ---------- STATE ----------
 const DEFAULT_STATE = () => ({
   biomass: 0,
@@ -1313,6 +1535,10 @@ const DEFAULT_STATE = () => ({
   godMode: false,
   passiveMultCheat: 1,
   stage: 0,
+  achv:           {},                   // {id: true} for unlocked achievements
+  totalRebirths:  0,                    // never resets
+  sporesGrabbed:  0,                    // never resets
+  lastSaveT:      0,                    // wall-clock ms of last save (offline calc)
 });
 
 let state = DEFAULT_STATE();
@@ -1337,6 +1563,34 @@ function stageBundle() {
   return STAGES[currentStage()];
 }
 
+// NEW: achievement bundle - small permanent multipliers from unlocked trophies.
+function achvBundle() {
+  const b = { clickMult: 1, passiveMult: 1 };
+  for (const a of ACHIEVEMENTS) {
+    if (!state.achv[a.id]) continue;
+    if (a.bonus.clickMult)   b.clickMult   *= a.bonus.clickMult;
+    if (a.bonus.passiveMult) b.passiveMult *= a.bonus.passiveMult;
+  }
+  return b;
+}
+
+// NEW: post-apex "Apex Tier" — once you hit Eldritch, every 10x of lifetime
+// past 1e12 grants +1 tier. Each tier multiplies click & passive by 1.5x and
+// adds +1% crit chance (capped at +20%). Keeps the endgame moving forever.
+function apexTier() {
+  if (state.lifetime < 1e12) return 0;
+  return Math.floor(Math.log10(state.lifetime / 1e12));
+}
+function apexBundle() {
+  const t = apexTier();
+  return {
+    tier: t,
+    clickMult:   Math.pow(1.5, t),
+    passiveMult: Math.pow(1.5, t),
+    critBonus:   Math.min(0.20, t * 0.01),
+  };
+}
+
 function computeClickPower() {
   const bundle = perkBundle();
   const s = stageBundle();
@@ -1344,7 +1598,7 @@ function computeClickPower() {
   for (const m of MUTATIONS) {
     pwr += (state.mutations[m.id] || 0) * m.power;
   }
-  return pwr * bundle.clickMult * s.clickMult;
+  return pwr * bundle.clickMult * s.clickMult * apexBundle().clickMult * eventBundle().clickMult * achvBundle().clickMult;
 }
 
 function computePassive() {
@@ -1354,14 +1608,14 @@ function computePassive() {
   for (const u of UPGRADES) {
     pps += (state.upgrades[u.id] || 0) * u.rate;
   }
-  return pps * bundle.passiveMult * state.passiveMultCheat * s.passiveMult;
+  return pps * bundle.passiveMult * state.passiveMultCheat * s.passiveMult * apexBundle().passiveMult * eventBundle().passiveMult * achvBundle().passiveMult;
 }
 
 function costOf(def, owned) {
   if (state.godMode) return 0;
   const bundle = perkBundle();
   const s = stageBundle();
-  return Math.ceil(def.base * Math.pow(def.grow, owned) * bundle.costMult * s.costMult);
+  return Math.ceil(def.base * Math.pow(def.grow, owned) * bundle.costMult * s.costMult * eventBundle().costMult);
 }
 
 function perkCost(p) {
@@ -1607,26 +1861,37 @@ const el = {
 };
 
 let lastStageRendered = -1;
+let lastApexTier = -1;
 
 // Build the inline pill row showing the *current* stage's active bonuses.
 function renderStageBonuses(idx) {
   const s = STAGES[idx];
+  const ap = apexBundle();
   const pills = [];
-  pills.push('<span class="pill">CLK <b>' + fmtMult(s.clickMult) + '</b></span>');
-  pills.push('<span class="pill">PSV <b>' + fmtMult(s.passiveMult) + '</b></span>');
-  pills.push('<span class="pill crit">CRIT <b>' + Math.round(s.critChance * 100) + '%</b></span>');
+  pills.push('<span class="pill">CLK <b>' + fmtMult(s.clickMult * ap.clickMult) + '</b></span>');
+  pills.push('<span class="pill">PSV <b>' + fmtMult(s.passiveMult * ap.passiveMult) + '</b></span>');
+  pills.push('<span class="pill crit">CRIT <b>' + Math.round((s.critChance + ap.critBonus) * 100) + '%</b></span>');
   pills.push('<span class="pill crit">CDMG <b>x' + s.critMult + '</b></span>');
   if (s.costMult < 1) {
     pills.push('<span class="pill cost">COST <b>-' + Math.round((1 - s.costMult) * 100) + '%</b></span>');
   }
+  if (ap.tier > 0) {
+    pills.push('<span class="pill" style="border-color:var(--rot);color:var(--rot)">APEX <b style="color:var(--rot)">T' + ap.tier + '</b></span>');
+  }
   el.stageBonuses.innerHTML = pills.join('');
 
-  // Next-stage preview
+  // Next-stage / next-tier preview
   if (idx < STAGES.length - 1) {
     const diff = stageBonusDiff(idx, idx + 1);
     el.stageNextHint.innerHTML = '<span class="tag">NEXT // ' + STAGES[idx+1].name.toUpperCase() + ':</span>' + diff;
   } else {
-    el.stageNextHint.innerHTML = '<span class="tag">// APEX FORM ACHIEVED</span>';
+    // Post-apex: show progress toward the next apex tier.
+    const nextThr = 1e12 * Math.pow(10, ap.tier + 1);
+    const prevThr = 1e12 * Math.pow(10, ap.tier);
+    const prog = Math.min(100, ((state.lifetime - prevThr) / (nextThr - prevThr)) * 100);
+    el.stageNextHint.innerHTML =
+      '<span class="tag">APEX T' + (ap.tier + 1) + ':</span>' +
+      '+50% CLK | +50% PSV | +1% CRIT @ ' + fmt(nextThr) + ' (' + prog.toFixed(1) + '%)';
   }
 }
 
@@ -1642,6 +1907,17 @@ function renderMonster(force=false) {
     }
     lastStageRendered = idx;
     state.stage = idx;
+    renderStageBonuses(idx);
+    lastApexTier = apexTier();
+  }
+  // Live-refresh apex tier even when stage doesn't change
+  const curTier = apexTier();
+  if (curTier !== lastApexTier) {
+    if (curTier > lastApexTier && lastApexTier >= 0) {
+      triggerEvolutionFlash();
+      toast('APEX TIER ' + curTier + ' // +50% CLK | +50% PSV | +1% CRIT');
+    }
+    lastApexTier = curTier;
     renderStageBonuses(idx);
   }
   el.stageLabel.textContent = 'STAGE ' + (idx+1) + ' / ' + STAGES.length;
@@ -1803,7 +2079,10 @@ function buyUpgrade(id) {
 
 // CLICK!
 function onMonsterClick(e) {
-  const power = computeClickPower();
+  // base click power (already includes stage/apex/event multipliers)
+  const base = computeClickPower();
+  // golden spore is the only click-only multiplier now
+  const power = base * sporeMult();
   const s = stageBundle();
   state.biomass += power;
   state.lifetime += power;
@@ -1823,9 +2102,10 @@ function onMonsterClick(e) {
   document.getElementById('monster-wrap').appendChild(r);
   setTimeout(()=>r.remove(), 650);
 
-  // CRIT: use stage-driven crit chance + multiplier.
+  // CRIT: use stage-driven crit chance + multiplier, with apex-tier & event bonus.
   // power is already counted toward biomass; crit adds the rest.
-  const isCrit = Math.random() < s.critChance;
+  const critChance = s.critChance + apexBundle().critBonus + eventBundle().critBonus;
+  const isCrit = Math.random() < critChance;
   if (isCrit) {
     const bonus = power * (s.critMult - 1);
     state.biomass += bonus;
@@ -1851,6 +2131,128 @@ el.monster.addEventListener('pointerdown', onMonsterClick);
 // prevent the touch from also firing a delayed synthetic click
 el.monster.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 
+// =====================================================================
+// JUICE LAYER: golden spores, random events, achievements.
+// Spores + events are ephemeral. Achievements persist.
+// =====================================================================
+
+// ---------- GOLDEN SPORE ----------
+// Rare drop on the monster. Click for a temp 7x click bonus (8 seconds).
+// Spawns roughly once every 5-10 minutes.
+let spore = null;       // {el, x, y, expiresAt}
+let nextSporeAt = performance.now() + 300000 + Math.random() * 300000;
+let sporeBuff   = { mult: 1, expiresAt: 0 };
+
+function maybeSpawnSpore(now) {
+  if (spore || now < nextSporeAt) return;
+  const wrap = document.getElementById('monster-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const pad = 40;
+  const x = pad + Math.random() * (rect.width - pad * 2);
+  const y = pad + Math.random() * (rect.height - pad * 2);
+  const node = document.createElement('div');
+  node.className = 'spore';
+  node.style.left = (x - 24) + 'px';
+  node.style.top  = (y - 24) + 'px';
+  node.innerHTML = '<svg viewBox="-50 -50 100 100">' +
+    '<defs><radialGradient id="sp" cx="35%" cy="35%">' +
+    '<stop offset="0%" stop-color="#fff7c2"/>' +
+    '<stop offset="50%" stop-color="#ffcf3a"/>' +
+    '<stop offset="100%" stop-color="#7a5210"/>' +
+    '</radialGradient></defs>' +
+    '<circle r="36" fill="url(#sp)" stroke="#3a2606" stroke-width="2"/>' +
+    '<path d="M-18,-12 Q-8,-20 0,-12 Q8,-20 18,-12" stroke="#3a2606" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="-12" cy="6" r="3" fill="#3a2606"/>' +
+    '<circle cx="12"  cy="6" r="3" fill="#3a2606"/>' +
+    '</svg>';
+  node.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    grabSpore();
+  });
+  wrap.appendChild(node);
+  spore = { el: node, expiresAt: now + 9000 };
+}
+
+function grabSpore() {
+  if (!spore) return;
+  spore.el.remove();
+  spore = null;
+  sporeBuff.mult = 7;
+  sporeBuff.expiresAt = performance.now() + 8000;
+  nextSporeAt = performance.now() + 300000 + Math.random() * 300000;
+  state.sporesGrabbed = (state.sporesGrabbed || 0) + 1;
+  toast('GOLDEN SPORE // CLICKS x7 FOR 8s');
+  playSound('perk');
+}
+
+function tickSpore(now) {
+  if (spore && now > spore.expiresAt) {
+    spore.el.remove();
+    spore = null;
+    nextSporeAt = now + 300000 + Math.random() * 300000;
+  }
+  maybeSpawnSpore(now);
+}
+
+function sporeMult() {
+  if (performance.now() > sporeBuff.expiresAt) sporeBuff.mult = 1;
+  return sporeBuff.mult;
+}
+
+// ---------- RANDOM EVENTS ----------
+// Roll every ~45-120s. Some are buffs, some are "fun debuffs" - never punishing.
+const EVENT_DEFS = [
+  { id:'frenzy',   name:'FEEDING FRENZY',     desc:'Clicks x3 for 15s',      type:'good', dur:15, apply:b=>{b.clickMult*=3;} },
+  { id:'bloom',    name:'BIOMASS BLOOM',      desc:'Passive x4 for 20s',     type:'good', dur:20, apply:b=>{b.passiveMult*=4;} },
+  { id:'lucky',    name:'LUCKY MUTATION',     desc:'Crit chance +30% for 12s', type:'good', dur:12, apply:b=>{b.critBonus+=0.30;} },
+  { id:'goldrush', name:'GOLDEN HOUR',        desc:'Click & passive x2 for 25s', type:'good', dur:25, apply:b=>{b.clickMult*=2; b.passiveMult*=2;} },
+  { id:'discount', name:'CLEARANCE SALE',     desc:'All costs -40% for 18s', type:'good', dur:18, apply:b=>{b.costMult*=0.6;} },
+  { id:'sleepy',   name:'SPECIMEN NAPS',      desc:'Passive halved for 10s', type:'bad',  dur:10, apply:b=>{b.passiveMult*=0.5;} },
+  { id:'inflate',  name:'COST INFLATION',     desc:'Costs +50% for 15s',     type:'bad',  dur:15, apply:b=>{b.costMult*=1.5;} },
+];
+let activeEvent = null; // {def, expiresAt}
+let nextEventAt = performance.now() + 60000 + Math.random() * 60000;
+
+function rollEvent(now) {
+  if (activeEvent || now < nextEventAt) return;
+  const def = EVENT_DEFS[Math.floor(Math.random() * EVENT_DEFS.length)];
+  activeEvent = { def, expiresAt: now + def.dur * 1000 };
+  renderEventBanner();
+  toast((def.type === 'bad' ? '!! ' : '++ ') + def.name + ' // ' + def.desc);
+}
+
+function tickEvent(now) {
+  if (activeEvent && now > activeEvent.expiresAt) {
+    activeEvent = null;
+    document.getElementById('event-banner-host').innerHTML = '';
+    nextEventAt = now + 45000 + Math.random() * 75000;
+  } else if (activeEvent) {
+    // update countdown text
+    const banner = document.querySelector('.event-banner .ev-time');
+    if (banner) banner.textContent = Math.ceil((activeEvent.expiresAt - now)/1000) + 's left';
+  }
+  rollEvent(now);
+}
+
+function renderEventBanner() {
+  if (!activeEvent) return;
+  const host = document.getElementById('event-banner-host');
+  const def = activeEvent.def;
+  host.innerHTML =
+    '<div class="event-banner ' + def.type + '">' +
+      '<span class="ev-name">' + def.name + '</span>' +
+      '<span class="ev-desc">' + def.desc + '</span>' +
+      '<span class="ev-time">--</span>' +
+    '</div>';
+}
+
+// Compute combined event modifier bundle (used in click/passive/cost).
+function eventBundle() {
+  const b = { clickMult:1, passiveMult:1, costMult:1, critBonus:0 };
+  if (activeEvent) activeEvent.def.apply(b);
+  return b;
+}
+
 // ---------- GAME LOOP @ ~60fps ----------
 let lastT = performance.now();
 let cardTick = 0;
@@ -1865,6 +2267,10 @@ function loop(now) {
     state.lifetime += earned;
     state.grandLifetime += earned;
   }
+
+  tickSpore(now);
+  tickEvent(now);
+  checkAchievements();
 
   refreshHeader();
   cardTick += dt;
@@ -1933,11 +2339,17 @@ document.getElementById('do-breach').addEventListener('click', () => {
     fk: state.fk,
     perks: state.perks,
     grandLifetime: state.grandLifetime,
+    achv: state.achv,
+    totalRebirths: (state.totalRebirths || 0) + 1,
+    sporesGrabbed: state.sporesGrabbed || 0,
   };
   state = DEFAULT_STATE();
   state.fk = keep.fk;
   state.perks = keep.perks;
   state.grandLifetime = keep.grandLifetime;
+  state.achv = keep.achv;
+  state.totalRebirths = keep.totalRebirths;
+  state.sporesGrabbed = keep.sporesGrabbed;
   const startBM = perkBundle().startBiomass;
   state.biomass = startBM;
   state.lifetime = startBM;
@@ -2074,8 +2486,10 @@ function playSound(name) {
 // ---------- SAVE / LOAD ----------
 const SAVE_KEY = 'mutationLabGenesis.v1';
 function save() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
-  catch(e) {}
+  try {
+    state.lastSaveT = Date.now();
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch(e) {}
 }
 function load() {
   try {
@@ -2154,10 +2568,108 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && creditsModal.classList.contains('show')) hideCredits();
 });
 
+// ---------- ACHIEVEMENTS ----------
+const achvToggleBtn = document.getElementById('achv-toggle');
+const achvModal     = document.getElementById('achv-modal');
+const achvPendingEl = document.getElementById('achv-pending');
+
+function checkAchievements() {
+  let newlyUnlocked = 0;
+  for (const a of ACHIEVEMENTS) {
+    if (state.achv[a.id]) continue;
+    if (a.check(state)) {
+      state.achv[a.id] = true;
+      newlyUnlocked++;
+      toast('TROPHY // ' + a.name);
+      playSound('perk');
+    }
+  }
+  if (newlyUnlocked > 0) {
+    refreshAchvBadge();
+    // re-render in case the trophy modal is open
+    if (achvModal.classList.contains('show')) renderAchvList();
+  }
+}
+
+function refreshAchvBadge() {
+  const unlocked = Object.keys(state.achv).length;
+  achvPendingEl.textContent = unlocked + '/' + ACHIEVEMENTS.length;
+  achvPendingEl.style.display = '';
+  achvPendingEl.style.background = unlocked === ACHIEVEMENTS.length ? 'var(--acid)' : 'var(--gold)';
+}
+
+function renderAchvList() {
+  const list = document.getElementById('achv-list');
+  list.innerHTML = ACHIEVEMENTS.map(a => {
+    const got = !!state.achv[a.id];
+    const bonusBits = [];
+    if (a.bonus.clickMult)   bonusBits.push('+' + Math.round((a.bonus.clickMult-1)*100) + '% CLK');
+    if (a.bonus.passiveMult) bonusBits.push('+' + Math.round((a.bonus.passiveMult-1)*100) + '% PSV');
+    return '<div class="achv-row ' + (got?'unlocked':'locked') + '">' +
+      '<div class="achv-icon">' + a.icon + '</div>' +
+      '<div>' +
+        '<div class="achv-name">' + a.name + '</div>' +
+        '<div class="achv-desc">' + a.desc + '</div>' +
+      '</div>' +
+      '<div class="achv-bonus">' + bonusBits.join(' / ') + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+achvToggleBtn.addEventListener('click', () => {
+  renderAchvList();
+  achvModal.classList.add('show');
+});
+achvModal.addEventListener('click', e => {
+  if (e.target === achvModal) achvModal.classList.remove('show');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && achvModal.classList.contains('show')) achvModal.classList.remove('show');
+});
+
+// ---------- OFFLINE PROGRESS ----------
+// On load: compute time-since-last-save, grant capped passive earnings, show modal.
+const OFFLINE_CAP_S = 2 * 60 * 60;   // 2 hours of passive income max
+const OFFLINE_MIN_S = 30;            // ignore tabs closed for <30s
+
+function applyOfflineProgress() {
+  if (!state.lastSaveT) return; // first run - skip
+  const nowMs = Date.now();
+  const elapsedS = Math.max(0, (nowMs - state.lastSaveT) / 1000);
+  if (elapsedS < OFFLINE_MIN_S) return;
+  const grantedS = Math.min(OFFLINE_CAP_S, elapsedS);
+  const pps = computePassive();
+  const earned = pps * grantedS;
+  if (earned <= 0) return;
+  state.biomass += earned;
+  state.lifetime += earned;
+  state.grandLifetime += earned;
+  showWelcomeBack(elapsedS, grantedS, earned);
+}
+
+function formatDuration(s) {
+  if (s < 60) return Math.floor(s) + 's';
+  if (s < 3600) return Math.floor(s/60) + 'm ' + Math.floor(s%60) + 's';
+  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
+}
+
+function showWelcomeBack(totalS, grantedS, earned) {
+  document.getElementById('welcome-time').textContent =
+    formatDuration(totalS) + (grantedS < totalS ? ' (capped at 2h)' : '');
+  document.getElementById('welcome-earned').textContent = '+' + fmt(earned);
+  document.getElementById('welcome-back').classList.add('show');
+}
+
+document.getElementById('welcome-claim').addEventListener('click', () => {
+  document.getElementById('welcome-back').classList.remove('show');
+});
+
 // ---------- BOOTSTRAP ----------
 function start() {
   load();
   buildLists();
+  applyOfflineProgress();
+  refreshAchvBadge();
   refreshAll();
   maybeShowBriefingOnLoad();
 }
