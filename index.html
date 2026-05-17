@@ -502,6 +502,7 @@ header.bar::after {
 }
 #achv-modal.show { display: flex; animation: briefingFade 0.3s; }
 .achv-card {
+  position: relative;
   width: min(520px, 100%);
   max-height: 86vh; overflow-y: auto;
   background: var(--bg-1);
@@ -533,6 +534,142 @@ header.bar::after {
 .achv-desc { font-size: 9px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; }
 .achv-bonus { font-size: 10px; color: var(--acid); letter-spacing: 1.5px; }
 .achv-row.locked .achv-bonus { color: var(--muted); opacity: 0.5; }
+.achv-row.secret.locked { border-left-color: var(--rot); }
+.achv-row.secret.locked .achv-icon { color: var(--rot); opacity: 0.6; }
+.achv-row.secret.locked .achv-name { color: var(--rot); opacity: 0.7; letter-spacing: 2px; }
+.achv-row.secret.unlocked { border-left-color: var(--blood); }
+.achv-row.secret.unlocked .achv-icon { color: var(--blood); }
+.achv-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px; margin-bottom: 14px;
+  padding: 10px; border: 1px solid var(--line); background: var(--bg-2);
+}
+.achv-stats > div { font-size: 9px; letter-spacing: 1px; color: var(--muted); text-align: center; }
+.achv-stats span { display: block; }
+.achv-stats b { display: block; font-size: 13px; color: var(--bone); font-weight: 700; margin-top: 2px; }
+
+/* ====================== CODEX (mutation entries) ====================== */
+#codex-toggle {
+  position: static; /* in the bottom-left toggle row alongside the others */
+  background: transparent; border: 0; color: var(--rot);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer; padding: 6px 10px;
+  z-index: 500; text-transform: uppercase;
+}
+#codex-toggle:hover { color: #d9b6ff; }
+#codex-toggle .pending {
+  display: inline-block; background: var(--rot); color: #1a0838;
+  margin-left: 4px; padding: 1px 5px; border-radius: 8px;
+  font-weight: 700; font-size: 9px;
+}
+
+#codex-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(4px);
+  z-index: 1500; display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#codex-modal.show { display: flex; animation: briefingFade 0.3s; }
+.codex-card-modal {
+  position: relative;
+  width: min(560px, 100%); max-height: 86vh; overflow-y: auto;
+  background: linear-gradient(180deg, #1a1124, #0e0716);
+  border: 1px solid var(--rot);
+  box-shadow: 0 0 40px rgba(191,159,255,0.25);
+  padding: 24px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.codex-card-modal h3 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 18px; letter-spacing: 5px; color: var(--rot);
+  text-align: center; margin-bottom: 4px;
+  text-shadow: 0 0 12px rgba(191,159,255,0.4);
+}
+.codex-card-modal .sub {
+  font-size: 10px; color: var(--muted); letter-spacing: 2px;
+  text-align: center; margin-bottom: 16px;
+}
+.codex-entry {
+  display: grid; grid-template-columns: 36px 1fr auto;
+  align-items: start; gap: 12px;
+  background: var(--bg-2); border-left: 2px solid var(--line);
+  padding: 10px 12px; margin-bottom: 6px;
+}
+.codex-entry.unlocked { border-left-color: var(--rot); }
+.codex-entry.locked .cx-glyph,
+.codex-entry.locked .cx-name,
+.codex-entry.locked .cx-flavor,
+.codex-entry.locked .cx-bonus { color: var(--muted); opacity: 0.55; }
+.cx-glyph {
+  font-family:'Major Mono Display'; font-size: 22px;
+  color: var(--rot); text-align: center;
+}
+.cx-name   { font-size: 12px; font-weight: 700; color: var(--bone); letter-spacing: 1px; }
+.cx-flavor { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.5; letter-spacing: 0.5px; font-style: italic; }
+.cx-bonus  { font-size: 10px; color: var(--acid); letter-spacing: 1.5px; align-self: center; }
+.codex-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  padding: 10px; background: var(--bg-2); border: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+.codex-stats > div { font-size: 9px; letter-spacing: 1px; color: var(--muted); text-align: center; }
+.codex-stats span { display: block; }
+.codex-stats b { display: block; font-size: 13px; color: var(--bone); font-weight: 700; margin-top: 2px; }
+
+/* Floating discovery card */
+#codex-card-host {
+  position: fixed; top: 110px; left: 50%; transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2100;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+  width: min(440px, 90vw);
+}
+.codex-card {
+  pointer-events: auto;
+  background: linear-gradient(180deg, #1a1124, #0e0716);
+  border: 1px solid var(--rot);
+  box-shadow: 0 0 24px rgba(191,159,255,0.35);
+  padding: 14px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  opacity: 0; transform: translateY(-12px) scale(0.96);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  width: 100%;
+}
+.codex-card.show { opacity: 1; transform: translateY(0) scale(1); }
+.codex-card-tag {
+  font-size: 9px; letter-spacing: 3px; color: var(--rot);
+  text-align: center; margin-bottom: 8px;
+}
+.codex-card-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px;}
+.codex-card-glyph {
+  font-family:'Major Mono Display'; font-size: 28px; color: var(--rot);
+  width: 40px; text-align: center;
+  text-shadow: 0 0 10px rgba(191,159,255,0.5);
+}
+.codex-card-name {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 16px; letter-spacing: 3px; color: var(--bone);
+}
+.codex-card-flavor {
+  font-size: 11px; color: var(--bone); opacity: 0.85;
+  font-style: italic; line-height: 1.5;
+}
+.codex-card-bonus {
+  margin-top: 8px; font-size: 10px; letter-spacing: 1.5px; color: var(--acid);
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  #codex-toggle {
+    font-size: 11px; padding: 8px 10px; min-height: 36px;
+    background: rgba(15,22,25,0.65); border: 1px solid var(--line);
+  }
+  .codex-card-modal { padding: 18px; }
+  .codex-card-modal h3 { font-size: 16px; }
+  .cx-glyph { font-size: 18px; }
+  #codex-card-host { top: 80px; }
+  .codex-card-name { font-size: 14px; letter-spacing: 2px; }
+}
 
 /* ====================== WELCOME BACK (offline) ====================== */
 #welcome-back {
@@ -611,6 +748,54 @@ footer.bar {
   box-shadow: 0 0 20px rgba(191,159,255,0.5);
 }
 #prestige-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ====================== VAULT (perk shop) ====================== */
+.footer-center { display: flex; gap: 10px; align-items: center; }
+#vault-btn {
+  background: linear-gradient(180deg, #0f1d33, #060b18);
+  color: var(--acid);
+  border: 1px solid var(--acid-dim);
+  padding: 8px 18px;
+  font-family: 'Major Mono Display', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#vault-btn:hover { box-shadow: 0 0 16px rgba(180,255,57,0.35); border-color: var(--acid); }
+#vault-btn #vault-rp-pill {
+  display: inline-block; margin-left: 8px;
+  background: rgba(180,255,57,0.12);
+  border: 1px solid var(--acid-dim);
+  padding: 1px 7px; font-size: 10px; letter-spacing: 1px; color: var(--acid);
+}
+
+/* Rebirth-confirm modal additions */
+.rebirth-impact {
+  background: var(--bg-2); border: 1px solid var(--line);
+  padding: 12px; margin: 6px 0 14px;
+  font-size: 11px; line-height: 1.7; color: var(--bone);
+}
+.rebirth-impact .line { display:flex; justify-content: space-between; gap: 12px; }
+.rebirth-impact .line span { color: var(--muted); letter-spacing: 1.5px; font-size: 10px; }
+.rebirth-impact .line b { color: var(--bone); font-weight: 700; }
+.rebirth-impact .line.warn b { color: var(--blood); }
+.rebirth-impact .line.keep b { color: var(--acid); }
+.rebirth-actions { display: flex; gap: 10px; align-items: stretch; }
+.rebirth-actions .do-breach { flex: 1; margin-top: 0; }
+.rebirth-cancel {
+  flex: 0 0 auto;
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--line);
+  font-family: 'Major Mono Display', monospace;
+  letter-spacing: 4px; font-size: 12px;
+  padding: 12px 18px; cursor: pointer;
+}
+.rebirth-cancel:hover { color: var(--bone); border-color: var(--bone); }
+.vault-hint {
+  margin-top: 14px; text-align: center;
+  font-size: 10px; color: var(--muted); letter-spacing: 2px;
+}
 
 .io-btn {
   background: transparent; color: var(--muted); border: 1px solid var(--line);
@@ -711,19 +896,127 @@ footer.bar {
   margin-bottom: 8px; display: flex; justify-content: space-between;
   text-shadow: 0 0 8px rgba(200,255,90,0.5);
 }
+
 #admin input {
   width: 100%; background: #232d30; border: 1px solid var(--acid-dim); color: var(--acid);
   padding: 8px; font-family: inherit; font-size: 12px; outline: none;
   letter-spacing: 2px;
 }
 #admin input:focus { border-color: var(--acid); box-shadow: 0 0 12px rgba(200,255,90,0.45); }
-#admin .term-log {
-  margin-top: 8px; font-size: 10px; color: var(--bone);
-  max-height: 100px; overflow-y: auto; line-height: 1.6;
-}
-#admin .term-log .ok { color: var(--acid); text-shadow: 0 0 6px rgba(200,255,90,0.4); }
-#admin .term-log .err { color: var(--blood); }
 #admin .hint { font-size: 9px; color: var(--acid-dim); margin-top: 6px; letter-spacing: 1px; }
+
+/* ====================== ADMIN PANEL (post-ADMINONLY) ====================== */
+#admin-btn {
+  position: fixed; top: 10px; right: 12px;
+  z-index: 200;
+  background: #2a0a0a; color: #ff8866;
+  border: 1px solid #c14a4a;
+  font-family: 'Major Mono Display', monospace;
+  font-size: 11px; letter-spacing: 3px;
+  padding: 6px 12px; cursor: pointer;
+  text-shadow: 0 0 8px rgba(193,74,74,0.6);
+  display: none; /* shown only when adminUnlocked */
+}
+#admin-btn.show { display: inline-block; }
+#admin-btn:hover { background: #3d1010; box-shadow: 0 0 14px rgba(193,74,74,0.6); }
+#admin-btn::before { content: '* '; color: #ff5577; }
+
+#admin-panel {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+  z-index: 1700;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#admin-panel.show { display: flex; animation: briefingFade 0.3s; }
+.admin-panel-card {
+  position: relative;
+  width: min(640px, 100%);
+  max-height: 88vh; overflow-y: auto;
+  background: linear-gradient(180deg, #1a1011 0%, #0e0708 100%);
+  border: 2px solid #c14a4a;
+  box-shadow: 0 0 40px rgba(193,74,74,0.3),
+              0 0 0 1px #2a0a0a inset;
+  padding: 22px 26px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--bone);
+}
+.admin-panel-card::before {
+  content: 'CLASSIFIED // ADMINISTRATIVE ACCESS';
+  display: block;
+  font-size: 9px; letter-spacing: 5px;
+  color: #ff5577; text-align: center;
+  border-bottom: 1px dashed #c14a4a;
+  padding-bottom: 10px; margin-bottom: 14px;
+}
+.admin-panel-card h2 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 20px; letter-spacing: 5px;
+  color: #ff8866; margin-bottom: 4px;
+  text-shadow: 0 0 10px rgba(255,136,102,0.4);
+}
+.admin-panel-card .sub {
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 2px; margin-bottom: 16px;
+}
+.admin-section {
+  margin-top: 14px;
+  border: 1px solid #3a1212;
+  background: rgba(193,74,74,0.04);
+  padding: 10px 12px;
+}
+.admin-section-title {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 11px; letter-spacing: 3px;
+  color: #ff8866; margin-bottom: 8px;
+  border-bottom: 1px dashed rgba(193,74,74,0.4);
+  padding-bottom: 4px;
+}
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px;
+}
+.admin-cmd {
+  background: #2a0a0a; color: #ff8866;
+  border: 1px solid #5a1818;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 1px;
+  padding: 8px 10px; cursor: pointer;
+  text-align: left;
+  transition: all 0.12s;
+}
+.admin-cmd:hover { background: #3d1010; border-color: #c14a4a; box-shadow: 0 0 10px rgba(193,74,74,0.3); }
+.admin-cmd.on    { background: #1a3d10; color: var(--acid); border-color: var(--acid-dim); }
+.admin-cmd.on:hover { background: #235218; }
+.admin-cmd .lbl { display:block; font-weight:700; font-size:11px; }
+.admin-cmd .desc{ display:block; font-size:9px; color: var(--muted); letter-spacing:1px; margin-top:2px; }
+.admin-cmd.on .desc { color: var(--acid-dim); }
+.admin-input-row {
+  display: flex; gap: 6px; margin-top: 6px;
+}
+.admin-input-row input {
+  flex: 1;
+  background: #1a0c0c; color: var(--bone);
+  border: 1px solid #5a1818;
+  font-family: inherit; font-size: 12px;
+  padding: 7px 8px;
+  outline: none;
+}
+.admin-input-row input:focus { border-color: #c14a4a; box-shadow: 0 0 8px rgba(193,74,74,0.4); }
+.admin-input-row button {
+  background: #2a0a0a; color: #ff8866; border: 1px solid #5a1818;
+  padding: 7px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer;
+}
+.admin-input-row button:hover { background: #3d1010; }
+
+@media (max-width: 760px) {
+  #admin-btn { font-size: 10px; padding: 5px 10px; top: 6px; right: 6px; letter-spacing: 2px; }
+  .admin-panel-card { padding: 18px; }
+  .admin-panel-card h2 { font-size: 16px; letter-spacing: 3px; }
+  .admin-grid { grid-template-columns: 1fr 1fr; }
+}
 
 /* Toast */
 .toast {
@@ -779,8 +1072,8 @@ footer.bar {
 }
 #credits-toggle:hover { color: var(--acid); }
 
-/* These three toggles get moved into .footer-left at boot, so unpin them. */
-#admin-toggle, #briefing-toggle, #credits-toggle { position: static; bottom: auto; left: auto; }
+/* These toggles get moved into .footer-left at boot, so unpin them. */
+#admin-toggle, #briefing-toggle, #credits-toggle, #achv-toggle { position: static; bottom: auto; left: auto; }
 
 #credits-modal {
   position: fixed; inset: 0;
@@ -1003,20 +1296,23 @@ footer.bar {
     height: auto;
     gap: 10px;
   }
-  .footer-left, .footer-right {
+  .footer-left, .footer-right, .footer-center {
     width: 100%;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 8px;
   }
   .footer-right { justify-content: flex-end; }
-  #prestige-btn {
+  .footer-center { flex-direction: column; }
+  #prestige-btn, #vault-btn {
     width: 100%;
     padding: 14px 22px;
     font-size: 13px;
     min-height: 48px;
   }
   .io-btn { padding: 8px 12px; font-size: 11px; min-height: 36px; }
+  .rebirth-actions { flex-direction: column-reverse; }
+  .rebirth-cancel  { padding: 14px; min-height: 48px; }
 
   /* MODAL: REBIRTH tree */
   .modal { width: 96vw; padding: 18px; max-height: 90vh; }
@@ -1161,11 +1457,11 @@ footer.bar {
 
 </div>
 
-<!-- REBIRTH MODAL -->
+<!-- REBIRTH CONFIRMATION MODAL -->
 <div class="modal-backdrop" id="prestige-modal">
   <div class="modal">
     <button class="modal-close" id="prestige-close">x</button>
-    <h2>REBIRTH</h2>
+    <h2>REBIRTH?</h2>
     <p class="sub">// dissolve the specimen. spawn it anew with deeper genes //</p>
 
     <div class="fk-pool">
@@ -1179,9 +1475,34 @@ footer.bar {
       </div>
     </div>
 
-    <div class="perks-grid" id="perks-grid"></div>
+    <div class="rebirth-impact" id="rebirth-impact"></div>
 
-    <button class="do-breach" id="do-breach" disabled>// COMMIT REBIRTH //</button>
+    <div class="rebirth-actions">
+      <button class="rebirth-cancel" id="prestige-cancel">// CANCEL</button>
+      <button class="do-breach" id="do-breach" disabled>// CONFIRM REBIRTH //</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENOME VAULT (perk shop) -->
+<div class="modal-backdrop" id="vault-modal">
+  <div class="modal">
+    <button class="modal-close" id="vault-close">x</button>
+    <h2>GENOME VAULT</h2>
+    <p class="sub">// permanent genetic upgrades. paid in Rebirth Points //</p>
+
+    <div class="fk-pool">
+      <div>
+        <div class="label">Rebirth Points</div>
+        <div class="value" id="vault-fk-cur">0</div>
+      </div>
+      <div style="text-align:right">
+        <div class="label">Perks owned</div>
+        <div class="value" id="vault-perks-owned" style="color:var(--acid)">0</div>
+      </div>
+    </div>
+
+    <div class="perks-grid" id="perks-grid"></div>
   </div>
 </div>
 
@@ -1313,15 +1634,87 @@ footer.bar {
 <!-- credits button -->
 <button id="credits-toggle" title="credits">// credits</button>
 
+<!-- ADMIN PANEL (visible only after typing ADMINONLY in the codes console) -->
+<button id="admin-btn" title="admin panel">ADMIN</button>
+<div id="admin-panel">
+  <div class="admin-panel-card">
+    <button class="modal-close" id="admin-panel-close">x</button>
+    <h2>ADMIN PANEL</h2>
+    <div class="sub">// administrative override active // changes save immediately //</div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">// SPECIMEN</div>
+      <div class="admin-grid">
+        <button class="admin-cmd" data-act="giveBM"   ><span class="lbl">+ BIOMASS</span><span class="desc">add x10 current</span></button>
+        <button class="admin-cmd" data-act="giveBM1B" ><span class="lbl">+ 1B BIOMASS</span><span class="desc">flat injection</span></button>
+        <button class="admin-cmd" data-act="evolve"   ><span class="lbl">FORCE EVOLVE</span><span class="desc">jump to next stage</span></button>
+        <button class="admin-cmd" data-act="maxStage" ><span class="lbl">MAX STAGE</span><span class="desc">teleport to Mythic</span></button>
+        <button class="admin-cmd" data-act="maxMut"   ><span class="lbl">MAX MUTATIONS</span><span class="desc">all clicks apex</span></button>
+        <button class="admin-cmd" data-act="maxUp"    ><span class="lbl">MAX UPGRADES</span><span class="desc">all passive apex</span></button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">// REBIRTH</div>
+      <div class="admin-grid">
+        <button class="admin-cmd" data-act="rp10"     ><span class="lbl">+ 10 RP</span><span class="desc">small grant</span></button>
+        <button class="admin-cmd" data-act="rp1k"     ><span class="lbl">+ 1000 RP</span><span class="desc">big grant</span></button>
+        <button class="admin-cmd" data-act="forceRb"  ><span class="lbl">FORCE REBIRTH</span><span class="desc">free rebirth at any lifetime</span></button>
+        <button class="admin-cmd" data-act="unlockMythic"><span class="lbl">UNLOCK MYTHIC</span><span class="desc">set totalRebirths=1</span></button>
+      </div>
+      <div class="admin-input-row">
+        <input id="admin-set-rp" type="number" placeholder="set RP to..." min="0" />
+        <button data-act="setRP">SET</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">// TOGGLES</div>
+      <div class="admin-grid">
+        <button class="admin-cmd" data-act="godmode"  ><span class="lbl">GODMODE</span><span class="desc">all costs free</span></button>
+        <button class="admin-cmd" data-act="fast10"   ><span class="lbl">PASSIVE x10</span><span class="desc">stacks, this run</span></button>
+        <button class="admin-cmd" data-act="spawnSpore"><span class="lbl">SPAWN SPORE</span><span class="desc">drop one now</span></button>
+        <button class="admin-cmd" data-act="goodEv"   ><span class="lbl">TRIGGER BUFF</span><span class="desc">random good event</span></button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">// TROPHIES</div>
+      <div class="admin-grid">
+        <button class="admin-cmd" data-act="allAchv"  ><span class="lbl">UNLOCK ALL</span><span class="desc">every trophy</span></button>
+        <button class="admin-cmd" data-act="resetAchv"><span class="lbl">RESET TROPHIES</span><span class="desc">re-earn them</span></button>
+        <button class="admin-cmd" data-act="resetCodes"><span class="lbl">RESET CODES</span><span class="desc">all one-time codes usable again</span></button>
+        <button class="admin-cmd" data-act="lock"     ><span class="lbl">LOCK PANEL</span><span class="desc">hide admin button</span></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ACHIEVEMENTS BUTTON + MODAL -->
 <button id="achv-toggle" title="achievements">// trophies<span id="achv-pending" class="pending" style="display:none">0</span></button>
 <div id="achv-modal">
   <div class="achv-card">
+    <button class="modal-close" id="achv-close">x</button>
     <h3>TROPHY ROOM</h3>
     <div class="sub">// permanent specimen merit //</div>
     <div id="achv-list"></div>
   </div>
 </div>
+
+<!-- CODEX BUTTON + MODAL -->
+<button id="codex-toggle" title="mutation codex">// codex<span id="codex-pending" class="pending" style="display:none">0</span></button>
+<div id="codex-modal">
+  <div class="codex-card-modal">
+    <button class="modal-close" id="codex-close">x</button>
+    <h3>MUTATION CODEX</h3>
+    <div class="sub">// field notes from the specimen //</div>
+    <div id="codex-list"></div>
+  </div>
+</div>
+
+<!-- floating codex discovery card -->
+<div id="codex-card-host"></div>
 
 <!-- WELCOME BACK (offline progress) -->
 <div id="welcome-back">
@@ -1343,8 +1736,7 @@ footer.bar {
     <span id="admin-close" style="cursor:pointer">[x]</span>
   </div>
   <input id="admin-input" placeholder="enter code..." autocomplete="off" spellcheck="false" />
-  <div class="term-log" id="admin-log"></div>
-  <div class="hint">press ` or ~ to toggle. type HELP to list codes.</div>
+  <div class="hint">press ` or ~ to toggle. type HELP to ask the general.</div>
 </div>
 
 <script>
@@ -1452,6 +1844,11 @@ const STAGES = [
   { name:'eldritch', threshold: 1e12,
     clickMult: 8.0,  passiveMult: 5.0,  critChance: 0.15, critMult: 10, costMult: 0.88,
     blurb: 'understanding it costs sanity.' },
+  // MYTHIC: 7th stage, only available after at least one rebirth.
+  // Without a rebirth, currentStage() caps at eldritch even if lifetime exceeds 1e15.
+  { name:'mythic',   threshold: 1e15, requiresRebirth: true,
+    clickMult: 14.0, passiveMult: 8.0, critChance: 0.18, critMult: 12, costMult: 0.84,
+    blurb: 'a god kept a journal. you are the last entry.' },
 ];
 
 // PRESTIGE PERKS: persist after rebirth. Cost rises with level.
@@ -1476,11 +1873,138 @@ const PERKS = [
     desc:'+15% Rebirth Points gain per level.',
     base:5, growCost:2.0, max:10,
     apply:(lv) => ({ fkMult: Math.pow(1.15, lv) }) },
+
+  // --- NEW perks ---
+  { id:'razor',     name:'Razor Genetics',
+    desc:'+1% crit chance per level (additive, no cap from this).',
+    base:4, growCost:1.7, max:20,
+    apply:(lv) => ({ critBonus: 0.01 * lv }) },
+  { id:'severance', name:'Severance Edge',
+    desc:'+0.5 crit damage multiplier per level.',
+    base:6, growCost:1.8, max:15,
+    apply:(lv) => ({ critMultBonus: 0.5 * lv }) },
+  { id:'goldsense', name:'Gold-Sense Organ',
+    desc:'Golden Spores spawn 10% more often per level.',
+    base:8, growCost:1.9, max:10,
+    apply:(lv) => ({ sporeRate: Math.pow(1.10, lv) }) },
+  { id:'dormancy',  name:'Dormancy Reflex',
+    desc:'+25% offline gain per level (raises the 2h cap as well).',
+    base:6, growCost:1.7, max:8,
+    apply:(lv) => ({ offlineMult: 1 + 0.25 * lv }) },
+  { id:'omen',      name:'Omen Reader',
+    desc:'Start each cycle 1 evolution stage ahead per level (max 3).',
+    base:25, growCost:3.0, max:3,
+    apply:(lv) => ({ startStageBoost: lv }) },
+];
+// MUTATION CODEX: collectible flavor entries with permanent passive bonuses.
+// Each unlocks at a grandLifetime threshold OR a custom trigger. Discovery is
+// passive - you don't pursue them directly. Pure long-tail content for players
+// who finished everything else. Each entry gives +1% to either click or passive
+// (tiny per-entry, meaningful in aggregate - all 24 unlocked = +24% bundle).
+//
+// Use `grand` for grandLifetime thresholds, or `check(s)` for custom triggers.
+const CODEX_ENTRIES = [
+  // --- early biomass milestones (discovery is gentle) ---
+  { id:'c01', glyph:'~',  name:'First Pulse',
+    flavor:'The substrate twitched. Logs said it was a calibration error. Logs lie.',
+    grand:50,       bonus:{clickMult:1.01} },
+  { id:'c02', glyph:'+',  name:'Sample 002',
+    flavor:'Tagged, refrigerated, escaped. We rebuilt it from memory.',
+    grand:500,      bonus:{passiveMult:1.01} },
+  { id:'c03', glyph:'#',  name:'Cellular Census',
+    flavor:'Population: too many. The interns stopped counting on day three.',
+    grand:5000,     bonus:{clickMult:1.01} },
+  { id:'c04', glyph:'%',  name:'Mucus Protocol',
+    flavor:'A new layer formed overnight. It hums when the lights are off.',
+    grand:50000,    bonus:{passiveMult:1.01} },
+  { id:'c05', glyph:'@',  name:'Eye, Or Approximation',
+    flavor:'It is watching us back now. The board has been informed.',
+    grand:500000,   bonus:{clickMult:1.01} },
+
+  // --- mid-game: bigger milestones, more flavor ---
+  { id:'c06', glyph:'V',  name:'Dental Surplus',
+    flavor:'We removed seventy-two teeth. Replaced overnight. Removed again. Repeat.',
+    grand:5e6,      bonus:{clickMult:1.02} },
+  { id:'c07', glyph:'X',  name:'Containment Drill #4',
+    flavor:'The drill went well. The containment did not. Nobody died, technically.',
+    grand:5e7,      bonus:{passiveMult:1.02} },
+  { id:'c08', glyph:'!',  name:'Dr. Halen\'s Notebook',
+    flavor:'Pages 1-43 are research. Page 44 is just the word HUNGRY in different sizes.',
+    grand:5e8,      bonus:{clickMult:1.02} },
+  { id:'c09', glyph:'O',  name:'The Second Heart',
+    flavor:'Located ventrally. It beats out of sync. We are not allowed to listen to it.',
+    grand:5e9,      bonus:{passiveMult:1.02} },
+  { id:'c10', glyph:'?',  name:'Subject Smiles',
+    flavor:'It has no mouth. The technicians say it smiles anyway. They have asked to be reassigned.',
+    grand:5e10,     bonus:{clickMult:1.02} },
+
+  // --- late: rebirth-era ---
+  { id:'c11', glyph:'B',  name:'Recursive Tissue',
+    flavor:'Cut a sample. The sample grew a sample. Burn it all, the dean said.',
+    grand:5e11,     bonus:{passiveMult:1.03} },
+  { id:'c12', glyph:'W',  name:'Spectator Mode',
+    flavor:'Subjects in adjacent labs report being watched. Subjects in OUR lab agree.',
+    grand:5e12,     bonus:{clickMult:1.03} },
+  { id:'c13', glyph:'Q',  name:'Acausal Lunch',
+    flavor:'Tuesday\'s feeding occurred Monday. The food was waiting. So was it.',
+    grand:5e13,     bonus:{passiveMult:1.03} },
+  { id:'c14', glyph:'S',  name:'Shed Skin, Vol. III',
+    flavor:'Curated by the janitor, Frank. Frank has been promoted to Curator.',
+    grand:5e14,     bonus:{clickMult:1.03} },
+  { id:'c15', glyph:'F',  name:'Apex Briefing',
+    flavor:'GEN. KOVACS: "Magnificent. Weaponize it." DR. HALEN: "It already is."',
+    grand:1e15,     bonus:{passiveMult:1.03} },
+
+  // --- mythic-era: rare collectors-only ---
+  { id:'c16', glyph:'M',  name:'The Crown Forms',
+    flavor:'Twelve spikes. The seventh sings on a frequency we cannot record but can feel.',
+    grand:5e15,     bonus:{clickMult:1.04} },
+  { id:'c17', glyph:'^',  name:'Liturgy of Mass',
+    flavor:'The specimen developed a vocabulary. It is liturgical. It is in our voices.',
+    grand:5e16,     bonus:{passiveMult:1.04} },
+  { id:'c18', glyph:'*',  name:'Reverse Mitosis',
+    flavor:'Two cells became one, larger, hungrier, and full of opinions about us.',
+    grand:5e17,     bonus:{clickMult:1.04} },
+  { id:'c19', glyph:'=',  name:'Internal Sun',
+    flavor:'It is warm even when refrigerated. Dr. Halen wears sunglasses to feedings.',
+    grand:5e18,     bonus:{passiveMult:1.04} },
+  { id:'c20', glyph:'O',  name:'Page 45',
+    flavor:'A new page appeared in the notebook. Only the word LISTEN. Written in our hands.',
+    grand:5e19,     bonus:{clickMult:1.05} },
+
+  // --- behavioral entries (custom triggers, not threshold-based) ---
+  { id:'c21', glyph:'@',  name:'Mycological Notes',
+    flavor:'Golden spores aren\'t random. They\'re samples sent BY the specimen. To us.',
+    check: s => (s.sporesGrabbed || 0) >= 10,
+    bonus:{clickMult:1.03} },
+  { id:'c22', glyph:'O',  name:'Recurrence',
+    flavor:'Each rebirth, it remembers more. We hope it doesn\'t remember us specifically.',
+    check: s => (s.totalRebirths || 0) >= 10,
+    bonus:{passiveMult:1.03} },
+  { id:'c23', glyph:'X',  name:'Critical Mass',
+    flavor:'On the 5000th click the specimen blinked in unison with the operator.',
+    check: s => (s.totalClicks || 0) >= 5000,
+    bonus:{clickMult:1.04} },
+  { id:'c24', glyph:'!',  name:'Codex Sealed',
+    flavor:'You have read everything the lab knows. Dr. Halen suggests you forget some of it.',
+    // unlocks when all other entries are unlocked
+    check: s => {
+      let n = 0;
+      for (const e of CODEX_ENTRIES) {
+        if (e.id === 'c24') continue;
+        if (s.codex && s.codex[e.id]) n++;
+      }
+      return n >= CODEX_ENTRIES.length - 1;
+    },
+    bonus:{clickMult:1.10, passiveMult:1.10} },
 ];
 
 // ACHIEVEMENTS: permanent milestones with small but stacking bonuses.
 // `check(state)` returns true if unlocked. `bonus` is applied via achvBundle().
+// `hidden: true` -> shown as "???" until unlocked. Hidden achievements give
+// bigger bonuses since they're harder to discover.
 const ACHIEVEMENTS = [
+  // ---- normal: visible from the start ----
   { id:'click100',  icon:'#', name:'First Pinch',     desc:'Reach 100 biomass.',
     check: s => s.grandLifetime >= 100,             bonus:{clickMult:1.02} },
   { id:'click10k',  icon:'#', name:'Snack Time',      desc:'Reach 10K biomass.',
@@ -1518,6 +2042,69 @@ const ACHIEVEMENTS = [
 
   { id:'spore1',    icon:'@', name:'Lucky Catch',     desc:'Grab a Golden Spore.',
     check: s => s.sporesGrabbed >= 1,               bonus:{clickMult:1.05} },
+
+  // ---- hidden: shown as ??? until unlocked. Bigger bonuses.  ----
+  { id:'sec_clicker',  icon:'!', hidden:true,
+    name:'Carpal Specimen',
+    desc:'Land 1000 manual clicks.',
+    check: s => (s.totalClicks||0) >= 1000,
+    bonus:{clickMult:1.20} },
+
+  { id:'sec_pacifist', icon:'?', hidden:true,
+    name:'Pacifist Researcher',
+    desc:'Reach 1M biomass without clicking the monster.',
+    // marker only set if you crossed 1M during a session that never clicked
+    check: s => !!s.unlocked_pacifist,
+    bonus:{passiveMult:1.30} },
+
+  { id:'sec_spore5',   icon:'@', hidden:true,
+    name:'Mycologist',
+    desc:'Grab 5 Golden Spores.',
+    check: s => s.sporesGrabbed >= 5,
+    bonus:{clickMult:1.20} },
+
+  { id:'sec_speedrun', icon:'V', hidden:true,
+    name:'Speedrunner',
+    desc:'Reach the Beast stage in under 5 minutes (single run).',
+    check: s => !!s.unlocked_speedrun,
+    bonus:{clickMult:1.25, passiveMult:1.25} },
+
+  { id:'sec_idler',    icon:'o', hidden:true,
+    name:'Patient Architect',
+    desc:'Claim 2 full hours of offline progress at once.',
+    check: s => !!s.unlocked_idler,
+    bonus:{passiveMult:1.30} },
+
+  { id:'sec_disaster', icon:'!', hidden:true,
+    name:'Worth The Risk',
+    desc:'Trigger every type of bad random event at least once.',
+    check: s => !!s.unlocked_disaster,
+    bonus:{clickMult:1.15, passiveMult:1.15} },
+
+  { id:'sec_apex10',   icon:'X', hidden:true,
+    name:'Past The Veil',
+    desc:'Reach Apex Tier 10.',
+    check: s => apexTier() >= 10,
+    bonus:{clickMult:1.50, passiveMult:1.50} },
+
+  { id:'sec_mythic',   icon:'V', hidden:true,
+    name:'Apotheosis',
+    desc:'Reach the Mythic stage.',
+    check: s => s.stage >= 6,
+    bonus:{clickMult:1.40, passiveMult:1.40} },
+
+  { id:'sec_perfect',  icon:'#', hidden:true,
+    name:'Completionist',
+    desc:'Unlock every other trophy.',
+    check: s => {
+      let n = 0;
+      for (const a of ACHIEVEMENTS) {
+        if (a.id === 'sec_perfect') continue;
+        if (s.achv[a.id]) n++;
+      }
+      return n >= ACHIEVEMENTS.length - 1;
+    },
+    bonus:{clickMult:2.0, passiveMult:2.0} },
 ];
 
 function totalMutBought(s) { let n=0; for (const k in s.mutations) n+=s.mutations[k]; return n; }
@@ -1539,20 +2126,44 @@ const DEFAULT_STATE = () => ({
   totalRebirths:  0,                    // never resets
   sporesGrabbed:  0,                    // never resets
   lastSaveT:      0,                    // wall-clock ms of last save (offline calc)
+  totalClicks:    0,                    // lifetime monster clicks - for hidden achv
+  runStartT:      0,                    // perf time when this run started - for speedrun achv
+  runClicks:      0,                    // clicks THIS run - for pacifist achv
+  badEventsSeen:  {},                   // {eventId:true} of bad events triggered - for disaster achv
+  unlocked_pacifist: false,
+  unlocked_speedrun: false,
+  unlocked_idler:    false,
+  unlocked_disaster: false,
+  adminUnlocked: false,                 // ADMINONLY toggles this on - other codes require it
+  usedCodes:     {},                    // {CODE:true} for codes that have been spent (one-time use)
+  codex:         {},                    // {id:true} for unlocked codex entries
 });
 
 let state = DEFAULT_STATE();
 
 // ---------- DERIVED VALUES ----------
 function perkBundle() {
-  const bundle = { clickMult:1, passiveMult:1, costMult:1, startBiomass:0, fkMult:1 };
+  // Fields that ADD: startBiomass, critBonus, critMultBonus, startStageBoost (capped at max single value)
+  // Fields that MULTIPLY: clickMult, passiveMult, costMult, fkMult, sporeRate, offlineMult
+  const bundle = {
+    clickMult:1, passiveMult:1, costMult:1, fkMult:1,
+    sporeRate:1, offlineMult:1,
+    startBiomass:0, critBonus:0, critMultBonus:0, startStageBoost:0
+  };
+  const additive = new Set(['startBiomass','critBonus','critMultBonus']);
   for (const p of PERKS) {
     const lv = state.perks[p.id] || 0;
     if (!lv) continue;
     const eff = p.apply(lv);
     for (const k in eff) {
-      if (k === 'startBiomass') bundle[k] += eff[k];
-      else bundle[k] *= eff[k];
+      if (k === 'startStageBoost') {
+        // single-source perk, but be defensive: take the max if ever stacked
+        bundle[k] = Math.max(bundle[k], eff[k]);
+      } else if (additive.has(k)) {
+        bundle[k] += eff[k];
+      } else {
+        bundle[k] *= eff[k];
+      }
     }
   }
   return bundle;
@@ -1570,6 +2181,18 @@ function achvBundle() {
     if (!state.achv[a.id]) continue;
     if (a.bonus.clickMult)   b.clickMult   *= a.bonus.clickMult;
     if (a.bonus.passiveMult) b.passiveMult *= a.bonus.passiveMult;
+  }
+  return b;
+}
+
+// Codex bundle - tiny multipliers per entry, big in aggregate.
+function codexBundle() {
+  const b = { clickMult: 1, passiveMult: 1 };
+  if (!state.codex) return b;
+  for (const e of CODEX_ENTRIES) {
+    if (!state.codex[e.id]) continue;
+    if (e.bonus.clickMult)   b.clickMult   *= e.bonus.clickMult;
+    if (e.bonus.passiveMult) b.passiveMult *= e.bonus.passiveMult;
   }
   return b;
 }
@@ -1598,7 +2221,7 @@ function computeClickPower() {
   for (const m of MUTATIONS) {
     pwr += (state.mutations[m.id] || 0) * m.power;
   }
-  return pwr * bundle.clickMult * s.clickMult * apexBundle().clickMult * eventBundle().clickMult * achvBundle().clickMult;
+  return pwr * bundle.clickMult * s.clickMult * apexBundle().clickMult * eventBundle().clickMult * achvBundle().clickMult * codexBundle().clickMult;
 }
 
 function computePassive() {
@@ -1608,7 +2231,7 @@ function computePassive() {
   for (const u of UPGRADES) {
     pps += (state.upgrades[u.id] || 0) * u.rate;
   }
-  return pps * bundle.passiveMult * state.passiveMultCheat * s.passiveMult * apexBundle().passiveMult * eventBundle().passiveMult * achvBundle().passiveMult;
+  return pps * bundle.passiveMult * state.passiveMultCheat * s.passiveMult * apexBundle().passiveMult * eventBundle().passiveMult * achvBundle().passiveMult * codexBundle().passiveMult;
 }
 
 function costOf(def, owned) {
@@ -1634,7 +2257,10 @@ function rpOnRebirth() {
 function currentStage() {
   let idx = 0;
   for (let i = 0; i < STAGES.length; i++) {
-    if (state.lifetime >= STAGES[i].threshold) idx = i;
+    const st = STAGES[i];
+    if (state.lifetime < st.threshold) continue;
+    if (st.requiresRebirth && (state.totalRebirths || 0) < 1) continue;
+    idx = i;
   }
   return idx;
 }
@@ -1832,6 +2458,69 @@ function svgFor(stageIdx) {
           <circle cx="90"  cy="90"  r="6"/>
         </g>
       </svg>`;
+
+    case 6: // MYTHIC - post-rebirth form. A glowing, crowned celestial bloom.
+      return `<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g6" cx="50%" cy="50%">
+            <stop offset="0%"  stop-color="#fff7c2"/>
+            <stop offset="35%" stop-color="#ffcf3a"/>
+            <stop offset="70%" stop-color="#c14a4a"/>
+            <stop offset="100%" stop-color="#3a0d18"/>
+          </radialGradient>
+          <radialGradient id="g6halo" cx="50%" cy="50%">
+            <stop offset="0%"  stop-color="#fff7c2" stop-opacity="0.0"/>
+            <stop offset="60%" stop-color="#ffcf3a" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#ffcf3a" stop-opacity="0.0"/>
+          </radialGradient>
+          <filter id="glow6">
+            <feGaussianBlur stdDeviation="3"/>
+          </filter>
+        </defs>
+        <!-- outer halo -->
+        <circle r="95" fill="url(#g6halo)"/>
+        <!-- spike crown (12 rays) -->
+        <g fill="#ffcf3a" stroke="#3a2606" stroke-width="1.2" filter="url(#glow6)">
+          <path d="M0,-95 L6,-70 L-6,-70 Z"/>
+          <path d="M67,-67 L52,-55 L45,-72 Z"/>
+          <path d="M95,0 L70,6 L70,-6 Z"/>
+          <path d="M67,67 L55,52 L72,45 Z"/>
+          <path d="M0,95 L-6,70 L6,70 Z"/>
+          <path d="M-67,67 L-52,55 L-45,72 Z"/>
+          <path d="M-95,0 L-70,-6 L-70,6 Z"/>
+          <path d="M-67,-67 L-55,-52 L-72,-45 Z"/>
+        </g>
+        <!-- inner petals -->
+        <g fill="#c14a4a" stroke="#3a0d18" stroke-width="1.5" opacity="0.85">
+          <ellipse cx="0"   cy="-50" rx="14" ry="28"/>
+          <ellipse cx="35"  cy="-35" rx="14" ry="28" transform="rotate(45 35 -35)"/>
+          <ellipse cx="50"  cy="0"   rx="14" ry="28" transform="rotate(90 50 0)"/>
+          <ellipse cx="35"  cy="35"  rx="14" ry="28" transform="rotate(135 35 35)"/>
+          <ellipse cx="0"   cy="50"  rx="14" ry="28"/>
+          <ellipse cx="-35" cy="35"  rx="14" ry="28" transform="rotate(-135 -35 35)"/>
+          <ellipse cx="-50" cy="0"   rx="14" ry="28" transform="rotate(-90 -50 0)"/>
+          <ellipse cx="-35" cy="-35" rx="14" ry="28" transform="rotate(-45 -35 -35)"/>
+        </g>
+        <!-- molten core -->
+        <circle r="38" fill="url(#g6)" stroke="#3a0d18" stroke-width="2"/>
+        <circle r="24" fill="none" stroke="#fff7c2" stroke-width="1" opacity="0.7"/>
+        <!-- single sovereign eye -->
+        <ellipse cx="0" cy="0" rx="18" ry="10" fill="#fff7c2"/>
+        <ellipse cx="0" cy="0" rx="9"  ry="9"  fill="#3a0d18"/>
+        <circle  cx="0" cy="0" r="3"  fill="#ffcf3a" filter="url(#glow6)"/>
+        <!-- tear / weep streaks -->
+        <path d="M-6,-1 q-3,18 6,28" stroke="#ffcf3a" stroke-width="1.5" fill="none" opacity="0.8"/>
+        <path d="M6,-1  q3,18 -6,28" stroke="#ffcf3a" stroke-width="1.5" fill="none" opacity="0.8"/>
+        <!-- floating motes -->
+        <g fill="#fff7c2" filter="url(#glow6)">
+          <circle cx="-72" cy="-30" r="2.5"/>
+          <circle cx="72"  cy="-30" r="2.5"/>
+          <circle cx="-30" cy="-72" r="2"/>
+          <circle cx="30"  cy="-72" r="2"/>
+          <circle cx="-72" cy="30"  r="2"/>
+          <circle cx="72"  cy="30"  r="2"/>
+        </g>
+      </svg>`;
   }
 }
 
@@ -1881,7 +2570,13 @@ function renderStageBonuses(idx) {
   el.stageBonuses.innerHTML = pills.join('');
 
   // Next-stage / next-tier preview
-  if (idx < STAGES.length - 1) {
+  const nextSt = STAGES[idx + 1];
+  if (nextSt && nextSt.requiresRebirth && (state.totalRebirths || 0) < 1) {
+    // Mythic is gated until first rebirth - tease it but don't preview bonuses.
+    el.stageNextHint.innerHTML =
+      '<span class="tag">LOCKED //</span>' +
+      'A 7th form stirs past death. REBIRTH to unlock <b style="color:var(--rot)">MYTHIC</b>.';
+  } else if (idx < STAGES.length - 1) {
     const diff = stageBonusDiff(idx, idx + 1);
     el.stageNextHint.innerHTML = '<span class="tag">NEXT // ' + STAGES[idx+1].name.toUpperCase() + ':</span>' + diff;
   } else {
@@ -2033,8 +2728,25 @@ function refreshCards() {
   }
 }
 
+// Smooth ticker for biomass display. Lerps toward true value each frame.
+// Big jumps (rebirth, cheats, offline claim) snap instantly via tickerSnap.
+let displayBiomass = 0;
+let tickerSnap = false;
+function tickBiomassDisplay(dt) {
+  const target = state.biomass;
+  if (tickerSnap || Math.abs(target - displayBiomass) > target * 0.5 + 100) {
+    displayBiomass = target;
+    tickerSnap = false;
+    return;
+  }
+  // ease toward target: ~12% of remaining gap per frame at 60fps -> snappy but smooth
+  const gap = target - displayBiomass;
+  displayBiomass += gap * Math.min(1, dt * 8);
+  if (Math.abs(gap) < 0.5) displayBiomass = target;
+}
+
 function refreshHeader() {
-  el.biomass.textContent = fmt(state.biomass);
+  el.biomass.textContent = fmt(displayBiomass);
   el.cps.textContent     = fmt(computeClickPower());
   el.pps.textContent     = fmt(computePassive()) + '/s';
   el.fk.textContent      = fmt(state.fk);
@@ -2087,6 +2799,8 @@ function onMonsterClick(e) {
   state.biomass += power;
   state.lifetime += power;
   state.grandLifetime += power;
+  state.totalClicks = (state.totalClicks || 0) + 1;
+  state.runClicks   = (state.runClicks   || 0) + 1;
 
   // squish anim
   el.monster.classList.remove('squish');
@@ -2102,17 +2816,19 @@ function onMonsterClick(e) {
   document.getElementById('monster-wrap').appendChild(r);
   setTimeout(()=>r.remove(), 650);
 
-  // CRIT: use stage-driven crit chance + multiplier, with apex-tier & event bonus.
+  // CRIT: use stage-driven crit chance + multiplier, with apex-tier, event, and perk bonus.
   // power is already counted toward biomass; crit adds the rest.
-  const critChance = s.critChance + apexBundle().critBonus + eventBundle().critBonus;
+  const pb = perkBundle();
+  const critChance = s.critChance + apexBundle().critBonus + eventBundle().critBonus + pb.critBonus;
+  const critMult   = s.critMult + pb.critMultBonus;
   const isCrit = Math.random() < critChance;
   if (isCrit) {
-    const bonus = power * (s.critMult - 1);
+    const bonus = power * (critMult - 1);
     state.biomass += bonus;
     state.lifetime += bonus;
     state.grandLifetime += bonus;
   }
-  spawnFloater(e.clientX, e.clientY, '+' + fmt(isCrit ? power * s.critMult : power), isCrit);
+  spawnFloater(e.clientX, e.clientY, '+' + fmt(isCrit ? power * critMult : power), isCrit);
   playSound('click');
 }
 
@@ -2138,9 +2854,13 @@ el.monster.addEventListener('touchstart', e => e.preventDefault(), { passive: fa
 
 // ---------- GOLDEN SPORE ----------
 // Rare drop on the monster. Click for a temp 7x click bonus (8 seconds).
-// Spawns roughly once every 5-10 minutes.
+// Spawns roughly once every 5-10 minutes; Gold-Sense perk speeds this up.
 let spore = null;       // {el, x, y, expiresAt}
-let nextSporeAt = performance.now() + 300000 + Math.random() * 300000;
+function sporeWait() {
+  const rate = perkBundle().sporeRate || 1;
+  return (300000 + Math.random() * 300000) / rate;
+}
+let nextSporeAt = performance.now() + sporeWait();
 let sporeBuff   = { mult: 1, expiresAt: 0 };
 
 function maybeSpawnSpore(now) {
@@ -2179,7 +2899,7 @@ function grabSpore() {
   spore = null;
   sporeBuff.mult = 7;
   sporeBuff.expiresAt = performance.now() + 8000;
-  nextSporeAt = performance.now() + 300000 + Math.random() * 300000;
+  nextSporeAt = performance.now() + sporeWait();
   state.sporesGrabbed = (state.sporesGrabbed || 0) + 1;
   toast('GOLDEN SPORE // CLICKS x7 FOR 8s');
   playSound('perk');
@@ -2189,7 +2909,7 @@ function tickSpore(now) {
   if (spore && now > spore.expiresAt) {
     spore.el.remove();
     spore = null;
-    nextSporeAt = now + 300000 + Math.random() * 300000;
+    nextSporeAt = now + sporeWait();
   }
   maybeSpawnSpore(now);
 }
@@ -2210,15 +2930,41 @@ const EVENT_DEFS = [
   { id:'sleepy',   name:'SPECIMEN NAPS',      desc:'Passive halved for 10s', type:'bad',  dur:10, apply:b=>{b.passiveMult*=0.5;} },
   { id:'inflate',  name:'COST INFLATION',     desc:'Costs +50% for 15s',     type:'bad',  dur:15, apply:b=>{b.costMult*=1.5;} },
 ];
+
+// MYTHIC EVENTS: only trigger once the specimen has reached stage 6 (Mythic).
+// Bigger swings, longer durations - real late-game drama.
+const MYTHIC_EVENTS = [
+  { id:'ascend',   name:'ASCENDANT GLOW',     desc:'Click x10 for 30s',           type:'mythic', dur:30, apply:b=>{b.clickMult*=10;} },
+  { id:'cosmos',   name:'COSMIC HUNGER',      desc:'Passive x15 for 45s',         type:'mythic', dur:45, apply:b=>{b.passiveMult*=15;} },
+  { id:'oracle',   name:'ORACLE TRANCE',      desc:'Crit chance +60%, dmg +5 for 20s', type:'mythic', dur:20, apply:b=>{b.critBonus+=0.60; b.critMultBonus+=5;} },
+  { id:'apotheo',  name:'APOTHEOSIS',         desc:'Click & passive x5, costs -70% for 40s', type:'mythic', dur:40, apply:b=>{b.clickMult*=5; b.passiveMult*=5; b.costMult*=0.3;} },
+  { id:'famine',   name:'GREAT FAMINE',       desc:'Passive x0.2 for 15s. It hungers.', type:'mythic-bad', dur:15, apply:b=>{b.passiveMult*=0.2;} },
+  { id:'recursion',name:'RECURSIVE BLOOM',    desc:'Spore spawns x5 for 60s',     type:'mythic', dur:60, apply:b=>{b.sporeRate=(b.sporeRate||1)*5;} },
+];
+
 let activeEvent = null; // {def, expiresAt}
 let nextEventAt = performance.now() + 60000 + Math.random() * 60000;
 
 function rollEvent(now) {
   if (activeEvent || now < nextEventAt) return;
-  const def = EVENT_DEFS[Math.floor(Math.random() * EVENT_DEFS.length)];
+  // 25% chance for a mythic event when player is at Mythic stage. Otherwise normal pool.
+  const pool = (state.stage >= 5 && Math.random() < 0.25) ? MYTHIC_EVENTS : EVENT_DEFS;
+  const def = pool[Math.floor(Math.random() * pool.length)];
   activeEvent = { def, expiresAt: now + def.dur * 1000 };
+  if (def.type === 'bad') {
+    state.badEventsSeen = state.badEventsSeen || {};
+    state.badEventsSeen[def.id] = true;
+    // Are all bad events seen now?
+    const badIds = EVENT_DEFS.filter(d => d.type === 'bad').map(d => d.id);
+    if (badIds.every(id => state.badEventsSeen[id])) {
+      state.unlocked_disaster = true;
+    }
+  }
   renderEventBanner();
-  toast((def.type === 'bad' ? '!! ' : '++ ') + def.name + ' // ' + def.desc);
+  const tag = def.type === 'mythic' ? '++ MYTHIC // ' :
+              def.type === 'mythic-bad' ? '!! MYTHIC // ' :
+              def.type === 'bad' ? '!! ' : '++ ';
+  toast(tag + def.name + ' // ' + def.desc);
 }
 
 function tickEvent(now) {
@@ -2271,6 +3017,8 @@ function loop(now) {
   tickSpore(now);
   tickEvent(now);
   checkAchievements();
+  checkCodex();
+  tickBiomassDisplay(dt);
 
   refreshHeader();
   cardTick += dt;
@@ -2280,22 +3028,56 @@ function loop(now) {
 }
 requestAnimationFrame(loop);
 
-// ---------- PRESTIGE ----------
+// ---------- REBIRTH CONFIRM + GENOME VAULT ----------
+// Vault is gated behind the rebirth confirm flow - it opens automatically
+// after a successful rebirth and there's no other entry point.
 const prestigeModal = document.getElementById('prestige-modal');
-el.prestige.addEventListener('click', openPrestige);
+const vaultModal    = document.getElementById('vault-modal');
+const vaultFkCur    = document.getElementById('vault-fk-cur');
+const vaultPerksOwn = document.getElementById('vault-perks-owned');
+const rebirthImpact = document.getElementById('rebirth-impact');
+
+// REBIRTH button -> confirmation dialog
+el.prestige.addEventListener('click', openRebirthConfirm);
 document.getElementById('prestige-close').addEventListener('click', ()=>prestigeModal.classList.remove('show'));
+document.getElementById('prestige-cancel').addEventListener('click', ()=>prestigeModal.classList.remove('show'));
 prestigeModal.addEventListener('click', e => { if (e.target === prestigeModal) prestigeModal.classList.remove('show'); });
 
-function openPrestige() {
-  renderPerks();
-  el.modalFK.textContent  = fmt(state.fk);
-  el.modalGain.textContent= fmt(rpOnRebirth());
-  el.doBreach.disabled = rpOnRebirth() < 1;
+// VAULT close only - opening happens in the rebirth-confirm handler.
+document.getElementById('vault-close').addEventListener('click', ()=>vaultModal.classList.remove('show'));
+vaultModal.addEventListener('click', e => { if (e.target === vaultModal) vaultModal.classList.remove('show'); });
+
+function openRebirthConfirm() {
+  const gain = rpOnRebirth();
+  document.getElementById('modal-fk-cur').textContent  = fmt(state.fk);
+  document.getElementById('modal-fk-gain').textContent = fmt(gain);
+  el.doBreach.disabled = gain < 1;
+
+  // What you lose vs what you keep, transparently
+  const totalMut = totalMutBought(state);
+  const totalUp  = totalUpBought(state);
+  rebirthImpact.innerHTML =
+    '<div class="line warn"><span>// LOSE</span><b>' + fmt(state.biomass) + ' biomass</b></div>' +
+    '<div class="line warn"><span>// LOSE</span><b>' + totalMut + ' mutations, ' + totalUp + ' upgrades</b></div>' +
+    '<div class="line warn"><span>// LOSE</span><b>this run\'s lifetime + apex tier</b></div>' +
+    '<div class="line keep"><span>// KEEP</span><b>perks, trophies, Rebirth Points</b></div>' +
+    '<div class="line keep"><span>// KEEP</span><b>grand-lifetime + all stats</b></div>' +
+    (gain >= 1 ? '<div class="line keep"><span>// GAIN</span><b>+' + fmt(gain) + ' RP</b></div>'
+               : '<div class="line warn"><span>// GAIN</span><b>not enough lifetime for any RP yet</b></div>');
+
   prestigeModal.classList.add('show');
 }
 
+function openVault() {
+  renderPerks();
+  vaultFkCur.textContent = fmt(state.fk);
+  vaultPerksOwn.textContent = Object.values(state.perks||{}).reduce((a,b)=>a+(b||0),0);
+  vaultModal.classList.add('show');
+}
+
 function renderPerks() {
-  el.perksGrid.innerHTML = PERKS.map(p => {
+  const grid = document.getElementById('perks-grid');
+  grid.innerHTML = PERKS.map(p => {
     const lv = state.perks[p.id] || 0;
     const maxed = lv >= p.max;
     const c = perkCost(p);
@@ -2311,7 +3093,7 @@ function renderPerks() {
     '</div>';
   }).join('');
   PERKS.forEach(p => {
-    const node = el.perksGrid.querySelector('[data-perk="' + p.id + '"]');
+    const node = grid.querySelector('[data-perk="' + p.id + '"]');
     if (node) node.addEventListener('click', () => buyPerk(p.id));
   });
 }
@@ -2325,45 +3107,76 @@ function buyPerk(id) {
   state.fk -= c;
   state.perks[id] = lv + 1;
   renderPerks();
-  el.modalFK.textContent = fmt(state.fk);
+  vaultFkCur.textContent = fmt(state.fk);
+  vaultPerksOwn.textContent = Object.values(state.perks||{}).reduce((a,b)=>a+(b||0),0);
   refreshAll();
   playSound('perk');
-  toast('PERK ACQUIRED');
+  toast('PERK ACQUIRED // ' + p.name + ' lv ' + state.perks[id]);
 }
 
-document.getElementById('do-breach').addEventListener('click', () => {
+// Refactored rebirth: clean function any UI can call. Preserves everything
+// permanent (perks, achievements, rebirth/click/spore counts, etc.) and gives
+// fresh trackers for the new run. Returns the RP gained.
+function doRebirth() {
   const gain = rpOnRebirth();
-  if (gain < 1) return;
-  state.fk += gain;
+  if (gain < 1) return 0;
+  // Bank everything that must survive
   const keep = {
-    fk: state.fk,
+    fk: state.fk + gain,
     perks: state.perks,
-    grandLifetime: state.grandLifetime,
     achv: state.achv,
+    grandLifetime: state.grandLifetime,
     totalRebirths: (state.totalRebirths || 0) + 1,
+    totalClicks:   state.totalClicks   || 0,
     sporesGrabbed: state.sporesGrabbed || 0,
+    badEventsSeen: state.badEventsSeen || {},
+    unlocked_pacifist: state.unlocked_pacifist,
+    unlocked_speedrun: state.unlocked_speedrun,
+    unlocked_idler:    state.unlocked_idler,
+    unlocked_disaster: state.unlocked_disaster,
+    lastSaveT: state.lastSaveT,
+    codex: state.codex || {},
+    adminUnlocked: state.adminUnlocked,
+    usedCodes: state.usedCodes || {},
   };
   state = DEFAULT_STATE();
-  state.fk = keep.fk;
-  state.perks = keep.perks;
-  state.grandLifetime = keep.grandLifetime;
-  state.achv = keep.achv;
-  state.totalRebirths = keep.totalRebirths;
-  state.sporesGrabbed = keep.sporesGrabbed;
-  const startBM = perkBundle().startBiomass;
-  state.biomass = startBM;
-  state.lifetime = startBM;
-  lastStageRendered = -1; // force re-render of stage 0
-  prestigeModal.classList.remove('show');
-  toast('REBIRTH COMPLETE +' + fmt(gain) + ' RP');
+  Object.assign(state, keep);
+  // Apply start-of-cycle perks
+  const pb = perkBundle();
+  state.biomass  = pb.startBiomass;
+  state.lifetime = pb.startBiomass;
+  // Omen Reader: skip ahead some stages by seeding lifetime at that threshold.
+  if (pb.startStageBoost > 0) {
+    const targetIdx = Math.min(pb.startStageBoost, STAGES.length - 1);
+    // Don't auto-grant the rebirth-gated mythic stage from a fresh run.
+    const safeIdx = STAGES[targetIdx].requiresRebirth ? targetIdx - 1 : targetIdx;
+    const thr = STAGES[Math.max(0, safeIdx)].threshold;
+    state.biomass  = Math.max(state.biomass,  thr);
+    state.lifetime = Math.max(state.lifetime, thr);
+  }
+  state.runStartT = performance.now();
+  state.runClicks = 0;
+  lastStageRendered = -1;
+  lastApexTier = -1;
+  tickerSnap = true;
   refreshAll();
   save();
+  return gain;
+}
+
+// CONFIRM REBIRTH button - banks RP, closes the confirm modal, and
+// immediately opens the Genome Vault so the player can spend their fresh RP.
+document.getElementById('do-breach').addEventListener('click', () => {
+  const gain = doRebirth();
+  if (gain <= 0) return;
+  prestigeModal.classList.remove('show');
+  toast('REBIRTH // +' + fmt(gain) + ' RP');
+  openVault();
 });
 
 // ---------- ADMIN CONSOLE ----------
 const adminBox = document.getElementById('admin');
 const adminInput = document.getElementById('admin-input');
-const adminLog = document.getElementById('admin-log');
 
 document.getElementById('admin-toggle').addEventListener('click', toggleAdmin);
 document.getElementById('admin-close').addEventListener('click', () => adminBox.classList.remove('show'));
@@ -2382,44 +3195,59 @@ function toggleAdmin() {
   if (adminBox.classList.contains('show')) setTimeout(()=>adminInput.focus(), 50);
 }
 
+// Each cheat is { fn, repeatable }. Non-repeatable codes get burned after first
+// use (recorded in state.usedCodes). Repeatable ones (toggles, info, panel-open)
+// can be run any time.
 const CHEATS = {
-  // ----- biomass injections -----
-  GREEDISGOOD: () => { state.biomass += 1e6; state.lifetime += 1e6; state.grandLifetime += 1e6;
-                       return '+1,000,000 biomass injected.'; },
-  GIGAGAIN:    () => { state.biomass += 1e8; state.lifetime += 1e8; state.grandLifetime += 1e8;
-                       return '+100,000,000 biomass injected.'; },
-  INFINITESOUP:() => { state.biomass += 1e12; state.lifetime += 1e12; state.grandLifetime += 1e12;
-                       return '+1T biomass dumped into the tank.'; },
+  // ----- ADMIN PANEL access -----
+  // ADMINONLY unlocks the panel (one-time auth) and opens it; afterwards you
+  // can re-open it from the // ADMIN button or by re-typing ADMINONLY.
+  ADMINONLY:   { repeatable: true,
+                 fn: () => { state.adminUnlocked = true;
+                             openAdminPanel();
+                             return '// ACCESS GRANTED. ADMIN PANEL OPEN.'; } },
+  LOCK:        { repeatable: true,
+                 fn: () => { state.adminUnlocked = false;
+                             closeAdminPanel();
+                             return '// ADMIN PANEL LOCKED.'; } },
 
-  // ----- progression skips -----
-  EVOLVENOW:   () => { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
-                       return 'all active mutations forced to apex.'; },
-  MAXEVERYTHING:()=> { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
-                       for (const u of UPGRADES)  state.upgrades[u.id]  = u.max;
-                       return 'mutations AND upgrades maxed.'; },
-  INSTAEVOLVE: () => {
-                       const next = STAGES[Math.min(state.stage + 1, STAGES.length - 1)];
-                       const need = Math.max(next.threshold, state.lifetime + 1);
-                       const add  = need - state.lifetime;
-                       state.biomass += add; state.lifetime += add; state.grandLifetime += add;
-                       return 'lifetime advanced to next stage threshold.'; },
+  // ----- biomass injections (one-time) -----
+  GREEDISGOOD: { fn: () => { state.biomass += 1e6; state.lifetime += 1e6; state.grandLifetime += 1e6;
+                             return '+1,000,000 biomass injected.'; } },
+  GIGAGAIN:    { fn: () => { state.biomass += 1e8; state.lifetime += 1e8; state.grandLifetime += 1e8;
+                             return '+100,000,000 biomass injected.'; } },
+  INFINITESOUP:{ fn: () => { state.biomass += 1e12; state.lifetime += 1e12; state.grandLifetime += 1e12;
+                             return '+1T biomass dumped into the tank.'; } },
 
-  // ----- multipliers / utility -----
-  FASTFORWARD: () => { state.passiveMultCheat *= 10;
-                       return 'passive multiplier x' + state.passiveMultCheat + ' (this run).'; },
-  DOUBLETIME:  () => { state.passiveMultCheat *= 2;
-                       return 'passive multiplier x' + state.passiveMultCheat + ' (this run).'; },
-  GODMODE:     () => { state.godMode = !state.godMode;
-                       return 'godmode = ' + state.godMode + '. all costs ' + (state.godMode?'-> 0.':'restored.'); },
+  // ----- progression skips (one-time) -----
+  EVOLVENOW:   { fn: () => { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
+                             return 'all active mutations forced to apex.'; } },
+  MAXEVERYTHING:{ fn: () => { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
+                              for (const u of UPGRADES)  state.upgrades[u.id]  = u.max;
+                              return 'mutations AND upgrades maxed.'; } },
+  INSTAEVOLVE: { fn: () => { const next = STAGES[Math.min(state.stage + 1, STAGES.length - 1)];
+                             const need = Math.max(next.threshold, state.lifetime + 1);
+                             const add  = need - state.lifetime;
+                             state.biomass += add; state.lifetime += add; state.grandLifetime += add;
+                             return 'lifetime advanced to next stage threshold.'; } },
 
-  // ----- rebirth helper -----
-  BREACHME:    () => { state.biomass += 1e15; state.lifetime += 1e15; state.grandLifetime += 1e15;
-                       return '+1Qa biomass + lifetime added. now rebirth.'; },
+  // ----- multipliers (one-time each) -----
+  FASTFORWARD: { fn: () => { state.passiveMultCheat *= 10;
+                             return 'passive multiplier x' + state.passiveMultCheat + ' (this run).'; } },
+  DOUBLETIME:  { fn: () => { state.passiveMultCheat *= 2;
+                             return 'passive multiplier x' + state.passiveMultCheat + ' (this run).'; } },
 
-  // ----- terminal utilities -----
-  CLEARLOG:    () => { adminLog.innerHTML = ''; return 'log cleared.'; },
+  // ----- toggle (repeatable) -----
+  GODMODE:     { repeatable: true,
+                 fn: () => { state.godMode = !state.godMode;
+                             return 'godmode = ' + state.godMode + '. all costs ' + (state.godMode?'-> 0.':'restored.'); } },
 
-  HELP:        () => 'ha you actually thought you would get help? Your on your own',
+  // ----- rebirth helper (one-time) -----
+  BREACHME:    { fn: () => { state.biomass += 1e15; state.lifetime += 1e15; state.grandLifetime += 1e15;
+                             return '+1Qa biomass + lifetime added. now rebirth.'; } },
+
+  HELP:        { repeatable: true,
+                 fn: () => 'HELP? THIS IS A WAR, NOT A LIBRARY. FIGURE IT OUT, SOLDIER.' },
 };
 
 adminInput.addEventListener('keydown', e => {
@@ -2428,16 +3256,20 @@ adminInput.addEventListener('keydown', e => {
   if (!raw) return;
   const code = raw.toUpperCase();
   adminInput.value = '';
-  let line;
-  if (CHEATS[code]) {
-    const msg = CHEATS[code]();
-    line = '<div class="ok">&gt; ' + code + ' :: ' + msg + '</div>';
+  const entry = CHEATS[code];
+
+  if (!entry) {
+    toast('// UNKNOWN CODE: ' + code);
+  } else if (!entry.repeatable && state.usedCodes[code]) {
+    toast('// ' + code + ' ALREADY USED');
+  } else {
+    const msg = entry.fn();
+    if (!entry.repeatable) state.usedCodes[code] = true;
+    toast('// ' + code + ' :: ' + msg);
+    tickerSnap = true;
     refreshAll();
     save();
-  } else {
-    line = '<div class="err">&gt; ' + code + ' :: unknown code.</div>';
   }
-  adminLog.innerHTML = line + adminLog.innerHTML;
 });
 
 // ---------- TOAST ----------
@@ -2511,6 +3343,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   try { localStorage.removeItem('mutationLabGenesis.briefingSeen'); } catch(e) {}
   state = DEFAULT_STATE();
   lastStageRendered = -1;
+  tickerSnap = true;
   refreshAll();
   toast('HARD RESET');
 });
@@ -2574,13 +3407,24 @@ const achvModal     = document.getElementById('achv-modal');
 const achvPendingEl = document.getElementById('achv-pending');
 
 function checkAchievements() {
+  // Update hidden-achievement preconditions before testing.
+  // Pacifist: 1M lifetime this run without a single click this run.
+  if (!state.unlocked_pacifist && state.lifetime >= 1e6 && (state.runClicks || 0) === 0) {
+    state.unlocked_pacifist = true;
+  }
+  // Speedrun: reach Beast (stage idx 3) in under 5 minutes of run time.
+  if (!state.unlocked_speedrun && state.stage >= 3 && state.runStartT) {
+    const runMs = performance.now() - state.runStartT;
+    if (runMs < 5 * 60 * 1000) state.unlocked_speedrun = true;
+  }
+
   let newlyUnlocked = 0;
   for (const a of ACHIEVEMENTS) {
     if (state.achv[a.id]) continue;
     if (a.check(state)) {
       state.achv[a.id] = true;
       newlyUnlocked++;
-      toast('TROPHY // ' + a.name);
+      toast((a.hidden ? '?? SECRET TROPHY // ' : 'TROPHY // ') + a.name);
       playSound('perk');
     }
   }
@@ -2598,33 +3442,151 @@ function refreshAchvBadge() {
   achvPendingEl.style.background = unlocked === ACHIEVEMENTS.length ? 'var(--acid)' : 'var(--gold)';
 }
 
+// Codex discovery loop. Runs each game tick. When an entry's threshold/check
+// passes, we mark it unlocked and pop a special discovery card.
+function checkCodex() {
+  state.codex = state.codex || {};
+  for (const e of CODEX_ENTRIES) {
+    if (state.codex[e.id]) continue;
+    let unlocked = false;
+    if (e.grand != null) unlocked = state.grandLifetime >= e.grand;
+    else if (e.check)    unlocked = !!e.check(state);
+    if (unlocked) {
+      state.codex[e.id] = true;
+      showCodexCard(e);
+      playSound('perk');
+      refreshCodexBadge();
+    }
+  }
+}
+
+function showCodexCard(entry) {
+  const host = document.getElementById('codex-card-host');
+  if (!host) return;
+  const bonusBits = [];
+  if (entry.bonus.clickMult)   bonusBits.push('+' + Math.round((entry.bonus.clickMult - 1) * 100) + '% CLK');
+  if (entry.bonus.passiveMult) bonusBits.push('+' + Math.round((entry.bonus.passiveMult - 1) * 100) + '% PSV');
+  const card = document.createElement('div');
+  card.className = 'codex-card';
+  card.innerHTML =
+    '<div class="codex-card-tag">// CODEX ENTRY UNLOCKED //</div>' +
+    '<div class="codex-card-row">' +
+      '<div class="codex-card-glyph">' + entry.glyph + '</div>' +
+      '<div class="codex-card-name">' + entry.name + '</div>' +
+    '</div>' +
+    '<div class="codex-card-flavor">' + entry.flavor + '</div>' +
+    '<div class="codex-card-bonus">' + bonusBits.join(' / ') + '</div>';
+  host.appendChild(card);
+  setTimeout(()=>card.classList.add('show'), 20);
+  setTimeout(()=>card.classList.remove('show'), 6500);
+  setTimeout(()=>card.remove(), 7200);
+}
+
 function renderAchvList() {
   const list = document.getElementById('achv-list');
-  list.innerHTML = ACHIEVEMENTS.map(a => {
+  // Stats summary block
+  const stats =
+    '<div class="achv-stats">' +
+      '<div><span>Grand Lifetime</span><b>' + fmt(state.grandLifetime) + '</b></div>' +
+      '<div><span>Total Clicks</span><b>' + fmt(state.totalClicks||0) + '</b></div>' +
+      '<div><span>Total Rebirths</span><b>' + fmt(state.totalRebirths||0) + '</b></div>' +
+      '<div><span>Spores Grabbed</span><b>' + fmt(state.sporesGrabbed||0) + '</b></div>' +
+      '<div><span>Apex Tier</span><b>T' + apexTier() + '</b></div>' +
+    '</div>';
+
+  const rows = ACHIEVEMENTS.map(a => {
     const got = !!state.achv[a.id];
+    const isHidden = a.hidden && !got;
     const bonusBits = [];
     if (a.bonus.clickMult)   bonusBits.push('+' + Math.round((a.bonus.clickMult-1)*100) + '% CLK');
     if (a.bonus.passiveMult) bonusBits.push('+' + Math.round((a.bonus.passiveMult-1)*100) + '% PSV');
-    return '<div class="achv-row ' + (got?'unlocked':'locked') + '">' +
-      '<div class="achv-icon">' + a.icon + '</div>' +
+    const icon  = isHidden ? '?' : a.icon;
+    const name  = isHidden ? '???' : a.name;
+    const desc  = isHidden ? 'A hidden trophy. Discover the condition.' : a.desc;
+    const bonus = isHidden ? '???' : bonusBits.join(' / ');
+    const cls   = 'achv-row ' + (got ? 'unlocked' : 'locked') + (a.hidden ? ' secret' : '');
+    return '<div class="' + cls + '">' +
+      '<div class="achv-icon">' + icon + '</div>' +
       '<div>' +
-        '<div class="achv-name">' + a.name + '</div>' +
-        '<div class="achv-desc">' + a.desc + '</div>' +
+        '<div class="achv-name">' + name + '</div>' +
+        '<div class="achv-desc">' + desc + '</div>' +
       '</div>' +
-      '<div class="achv-bonus">' + bonusBits.join(' / ') + '</div>' +
+      '<div class="achv-bonus">' + bonus + '</div>' +
     '</div>';
   }).join('');
+
+  list.innerHTML = stats + rows;
 }
 
 achvToggleBtn.addEventListener('click', () => {
   renderAchvList();
   achvModal.classList.add('show');
 });
+document.getElementById('achv-close').addEventListener('click', () => {
+  achvModal.classList.remove('show');
+});
 achvModal.addEventListener('click', e => {
   if (e.target === achvModal) achvModal.classList.remove('show');
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && achvModal.classList.contains('show')) achvModal.classList.remove('show');
+});
+
+// ---------- CODEX MODAL ----------
+const codexToggleBtn = document.getElementById('codex-toggle');
+const codexModal     = document.getElementById('codex-modal');
+const codexPendingEl = document.getElementById('codex-pending');
+
+function refreshCodexBadge() {
+  const unlocked = Object.keys(state.codex || {}).length;
+  codexPendingEl.textContent = unlocked + '/' + CODEX_ENTRIES.length;
+  codexPendingEl.style.display = '';
+  codexPendingEl.style.background = unlocked === CODEX_ENTRIES.length ? 'var(--acid)' : 'var(--rot)';
+  codexPendingEl.style.color = unlocked === CODEX_ENTRIES.length ? 'var(--bg-0)' : '#1a0838';
+}
+
+function renderCodexList() {
+  const list = document.getElementById('codex-list');
+  const unlocked = Object.keys(state.codex || {}).length;
+  const total = CODEX_ENTRIES.length;
+  const cb = codexBundle();
+  const stats =
+    '<div class="codex-stats">' +
+      '<div><span>Entries</span><b>' + unlocked + ' / ' + total + '</b></div>' +
+      '<div><span>Codex Bonus</span><b>x' + (cb.clickMult * cb.passiveMult).toFixed(2) + '</b></div>' +
+    '</div>';
+  const rows = CODEX_ENTRIES.map(e => {
+    const got = !!(state.codex && state.codex[e.id]);
+    const bonusBits = [];
+    if (e.bonus.clickMult)   bonusBits.push('+' + Math.round((e.bonus.clickMult - 1) * 100) + '% CLK');
+    if (e.bonus.passiveMult) bonusBits.push('+' + Math.round((e.bonus.passiveMult - 1) * 100) + '% PSV');
+    const glyph  = got ? e.glyph : '?';
+    const name   = got ? e.name : '???';
+    const flavor = got ? e.flavor : 'A field note is missing. Keep growing.';
+    return '<div class="codex-entry ' + (got?'unlocked':'locked') + '">' +
+      '<div class="cx-glyph">' + glyph + '</div>' +
+      '<div>' +
+        '<div class="cx-name">' + name + '</div>' +
+        '<div class="cx-flavor">' + flavor + '</div>' +
+      '</div>' +
+      '<div class="cx-bonus">' + bonusBits.join(' / ') + '</div>' +
+    '</div>';
+  }).join('');
+  list.innerHTML = stats + rows;
+}
+
+codexToggleBtn.addEventListener('click', () => {
+  renderCodexList();
+  codexModal.classList.add('show');
+});
+document.getElementById('codex-close').addEventListener('click', () => {
+  codexModal.classList.remove('show');
+});
+codexModal.addEventListener('click', e => {
+  if (e.target === codexModal) codexModal.classList.remove('show');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && codexModal.classList.contains('show')) codexModal.classList.remove('show');
 });
 
 // ---------- OFFLINE PROGRESS ----------
@@ -2637,13 +3599,18 @@ function applyOfflineProgress() {
   const nowMs = Date.now();
   const elapsedS = Math.max(0, (nowMs - state.lastSaveT) / 1000);
   if (elapsedS < OFFLINE_MIN_S) return;
-  const grantedS = Math.min(OFFLINE_CAP_S, elapsedS);
+  const offMult = perkBundle().offlineMult || 1;
+  const cap = OFFLINE_CAP_S * offMult;     // dormancy raises the cap
+  const grantedS = Math.min(cap, elapsedS);
   const pps = computePassive();
-  const earned = pps * grantedS;
+  const earned = pps * grantedS * offMult; // and the rate
   if (earned <= 0) return;
   state.biomass += earned;
   state.lifetime += earned;
   state.grandLifetime += earned;
+  tickerSnap = true;
+  // Hidden achievement: claimed the full base 2-hour cap (regardless of perk).
+  if (elapsedS >= OFFLINE_CAP_S) state.unlocked_idler = true;
   showWelcomeBack(elapsedS, grantedS, earned);
 }
 
@@ -2665,12 +3632,113 @@ document.getElementById('welcome-claim').addEventListener('click', () => {
 });
 
 // ---------- BOOTSTRAP ----------
+// ---------- ADMIN PANEL (post-ADMINONLY) ----------
+const adminPanel    = document.getElementById('admin-panel');
+const adminBtn      = document.getElementById('admin-btn');
+
+// Always-on button visibility based on adminUnlocked flag
+function refreshAdminBtn() {
+  adminBtn.classList.toggle('show', !!state.adminUnlocked);
+}
+
+function openAdminPanel() {
+  refreshAdminBtn();
+  adminPanel.classList.add('show');
+  // mark all admin-cmd buttons that represent toggles
+  document.querySelector('[data-act="godmode"]').classList.toggle('on', !!state.godMode);
+}
+function closeAdminPanel() {
+  adminPanel.classList.remove('show');
+  refreshAdminBtn();
+}
+
+adminBtn.addEventListener('click', openAdminPanel);
+document.getElementById('admin-panel-close').addEventListener('click', closeAdminPanel);
+adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdminPanel(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && adminPanel.classList.contains('show')) closeAdminPanel();
+});
+
+// Action dispatcher. Each command runs a small handler and refreshes the UI.
+const ADMIN_ACTIONS = {
+  giveBM:   () => { const n = Math.max(1000, state.biomass * 10);
+                    state.biomass += n; state.lifetime += n; state.grandLifetime += n;
+                    return '+' + fmt(n) + ' biomass'; },
+  giveBM1B: () => { state.biomass += 1e9; state.lifetime += 1e9; state.grandLifetime += 1e9;
+                    return '+1B biomass'; },
+  evolve:   () => { const next = STAGES[Math.min(state.stage + 1, STAGES.length - 1)];
+                    if (next.requiresRebirth && (state.totalRebirths||0) < 1) state.totalRebirths = 1;
+                    const need = Math.max(next.threshold, state.lifetime + 1);
+                    const add  = need - state.lifetime;
+                    state.biomass += add; state.lifetime += add; state.grandLifetime += add;
+                    return 'evolved -> ' + next.name; },
+  maxStage: () => { state.totalRebirths = Math.max(1, state.totalRebirths || 0);
+                    const top = STAGES[STAGES.length - 1].threshold;
+                    const add = Math.max(0, top - state.lifetime);
+                    state.biomass += add; state.lifetime += add; state.grandLifetime += add;
+                    return 'specimen advanced to MYTHIC'; },
+  maxMut:   () => { for (const m of MUTATIONS) state.mutations[m.id] = m.max;
+                    return 'all mutations apex'; },
+  maxUp:    () => { for (const u of UPGRADES) state.upgrades[u.id] = u.max;
+                    return 'all upgrades apex'; },
+
+  rp10:     () => { state.fk += 10;   return '+10 RP'; },
+  rp1k:     () => { state.fk += 1000; return '+1000 RP'; },
+  setRP:    () => { const v = Math.max(0, parseInt(document.getElementById('admin-set-rp').value, 10) || 0);
+                    state.fk = v; return 'RP set to ' + v; },
+  forceRb:  () => { // Grant at least 1 RP so doRebirth() proceeds even at low lifetime
+                    const before = state.lifetime;
+                    if (before < 1e6) { const add = 1e6 - before;
+                      state.lifetime += add; state.grandLifetime += add; state.biomass += add; }
+                    const gain = doRebirth();
+                    return 'forced rebirth (+' + fmt(gain) + ' RP)'; },
+  unlockMythic: () => { state.totalRebirths = Math.max(1, state.totalRebirths || 0);
+                    return 'Mythic gate unlocked (totalRebirths=' + state.totalRebirths + ')'; },
+
+  godmode:  () => { state.godMode = !state.godMode;
+                    document.querySelector('[data-act="godmode"]').classList.toggle('on', state.godMode);
+                    return 'godmode = ' + state.godMode; },
+  fast10:   () => { state.passiveMultCheat *= 10; return 'passive x' + state.passiveMultCheat; },
+  spawnSpore: () => { nextSporeAt = performance.now() - 1; return 'spore en route'; },
+  goodEv:   () => { const good = EVENT_DEFS.filter(d => d.type === 'good');
+                    const def = good[Math.floor(Math.random() * good.length)];
+                    activeEvent = { def, expiresAt: performance.now() + def.dur * 1000 };
+                    renderEventBanner();
+                    return def.name + ' triggered'; },
+
+  allAchv:  () => { for (const a of ACHIEVEMENTS) state.achv[a.id] = true;
+                    refreshAchvBadge();
+                    return 'all trophies unlocked'; },
+  resetAchv:() => { state.achv = {}; refreshAchvBadge();
+                    return 'trophies wiped'; },
+  resetCodes: () => { state.usedCodes = {}; return 'one-time codes can be re-used'; },
+  lock:     () => { state.adminUnlocked = false; closeAdminPanel();
+                    return 'admin locked. type ADMINONLY to regain access.'; },
+};
+
+adminPanel.addEventListener('click', e => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn) return;
+  const act = btn.dataset.act;
+  const handler = ADMIN_ACTIONS[act];
+  if (!handler) return;
+  const msg = handler();
+  tickerSnap = true;
+  refreshAll();
+  save();
+  toast('// ADMIN // ' + (msg || act));
+});
+
 function start() {
   load();
   buildLists();
   applyOfflineProgress();
   refreshAchvBadge();
+  refreshCodexBadge();
+  // Seed run-start if missing (first load, or save from before this field existed).
+  if (!state.runStartT) state.runStartT = performance.now();
   refreshAll();
+  refreshAdminBtn();
   maybeShowBriefingOnLoad();
 }
 start();
